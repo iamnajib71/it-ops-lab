@@ -1,4 +1,4 @@
-# IT Ops Lab: AI service-desk copilot and small-office homelab
+# IT Ops Lab: AI service-desk copilot
 
 A self-hosted lab that shows how a small IT team can answer routine tickets faster **without letting AI make risky decisions**.
 Tickets come in through a webhook, an n8n pipeline triages them, finds the right knowledge base article with hybrid search,
@@ -12,7 +12,8 @@ cloud tier is switched on, only the redacted ticket text and the retrieved KB ex
 
 **For hiring managers:** this repo is about service desk judgement more than AI. Start with *Why the gate is rule-based* below
 (two real failures I caught in testing and how I fixed them), the KB articles in `kb/`, and the SLA and escalation policy in
-`kb/service-desk-policy.md`.
+`kb/service-desk-policy.md`. For hands-on support work (VPN, file and print servers, AD account tasks, worked tickets),
+see the companion [IT Support Homelab](https://github.com/iamnajib71/it-support-homelab).
 
 ![Service desk copilot dashboard](docs/img/grafana-dashboard.png)
 
@@ -95,11 +96,10 @@ Approve a held reply: `GET http://localhost:5678/webhook/approve?id=<ticket>&act
 Requests without the token are rejected. The shared token stands in for SSO in this lab, and the approver name is self-reported, so a real deployment would take identity from SSO and keep an audit log.
 Dashboard: http://localhost:13000 (anonymous read-only view is enabled).
 
-## Homelab profile
+## The office it supports
 
-`docker compose --profile homelab up -d` adds the small-office services the knowledge base talks about: a WireGuard VPN
-(wg-easy), a Samba file server with Public, Finance and Scans shares and per-user access, a CUPS print server
-(Office-Laser, Office-PDF) and Uptime Kuma monitoring. See `docs/homelab-runbook.md`.
+The VPN, file server, print server and Active Directory that these KB articles describe are built and tested in a separate repo,
+[IT Support Homelab](https://github.com/iamnajib71/it-support-homelab), with three worked support cases and a runbook.
 
 ## Layout
 
