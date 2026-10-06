@@ -29,7 +29,7 @@
         0
       ],
       "parameters": {
-        "jsCode": "const q = $input.first().json.query || {};\nconst action = q.action === 'approve' ? 'approve' : q.action === 'reject' ? 'reject' : null;\nif (!/^\\d+$/.test(q.id || '') || !action) throw new Error('Use ?id=<ticket>&action=approve|reject&by=<name>');\nreturn [{ json: { id: q.id, action, by: (q.by || 'technician').slice(0, 60) } }];"
+        "jsCode": "const q = $input.first().json.query || {};\n// Lab stand-in for SSO: approval links carry a shared token from .env (APPROVAL_TOKEN).\nif (!$env.APPROVAL_TOKEN || q.token !== $env.APPROVAL_TOKEN) throw new Error('Invalid or missing approval token');\nconst action = q.action === 'approve' ? 'approve' : q.action === 'reject' ? 'reject' : null;\nif (!/^\\d+$/.test(q.id || '') || !action) throw new Error('Use ?id=<ticket>&action=approve|reject&by=<name>&token=<token>');\nreturn [{ json: { id: q.id, action, by: (q.by || 'technician').slice(0, 60) } }];"
       }
     },
     {

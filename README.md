@@ -7,7 +7,12 @@ decides whether the reply can go out automatically or must wait for a technician
 that handles routing, retries, fallback, rate limits, a cloud budget and a circuit breaker, and logs cost and latency to Postgres
 for a Grafana dashboard.
 
-Everything runs locally on Docker and Ollama (no paid APIs, no ticket data leaves the machine).
+Everything runs locally on Docker and Ollama. By default (`CLOUD_TIER=off`) no ticket data leaves the machine. If the optional
+cloud tier is switched on, only the redacted ticket text and the retrieved KB excerpts are sent, and only for the judging step.
+
+**For hiring managers:** this repo is about service desk judgement more than AI. Start with *Why the gate is rule-based* below
+(two real failures I caught in testing and how I fixed them), the KB articles in `kb/`, and the SLA and escalation policy in
+`kb/service-desk-policy.md`.
 
 ![Service desk copilot dashboard](docs/img/grafana-dashboard.png)
 
@@ -23,7 +28,7 @@ Everything runs locally on Docker and Ollama (no paid APIs, no ticket data leave
 | Output arbitration | two drafts from different models, blind judge, plus deterministic checks (citations must match retrieved sections, both drafts must cite the same article) |
 | Risk controls | PII detection and redaction before any model sees the text, security and access requests always go to a human |
 | Observability | Grafana dashboard provisioned as code: outcomes, fallback rate, latency by model, gateway events, approval queue |
-| Testing | `tests/run_demo.py` sends 6 realistic tickets and checks each lands in the right queue (currently 6/6, see `docs/demo-run.txt`) |
+| Testing | `tests/run_demo.py` is a smoke test: 6 realistic tickets, each checked against its expected queue (6/6 in `docs/demo-run.txt`). It is not a full evaluation |
 
 ## Architecture
 
@@ -57,11 +62,11 @@ final decision is made by code that mirrors the written policy, not by a model:
 - P1 and security tickets are escalated, P2 always needs a person.
 - Any access or permission change needs approval. A regex backstop catches these even when the model labels them as something else (this was a real miss in testing).
 - Tickets with personal or sensitive data are redacted and held.
-- A reply goes out automatically only if the judge says it is grounded, confidence is at least 0.8, it cites a section that was actually retrieved, and both independent drafts relied on the same article.
+- A reply is sent automatically (status `auto_resolved` means "reply sent", not "fixed") only if the judge says it is grounded, confidence is at least 0.8, it cites a section that was actually retrieved, and both independent drafts relied on the same article.
 
 ### Gateway behaviour you can see in the dashboard
 
-The judge's first choice is a cloud model. On a free plan it returns HTTP 402, so the gateway records the failure and falls back
+With `CLOUD_TIER=on` (as in the screenshot), the judge's first choice is a cloud model. On a free plan it returns HTTP 402, so the gateway records the failure and falls back
 to `llama3.1:8b`. After three failures in ten minutes the circuit opens and the cloud model is skipped without a network call.
 Once the daily cloud budget is spent it is skipped too. Local models cost $0, and cloud prices in `model_prices` are illustrative.
 
@@ -86,7 +91,8 @@ curl -X POST localhost:5678/webhook/ticket -H "Content-Type: application/json" \
   -d '{"name":"Sam","subject":"Printer offline","body":"My print job is stuck and the printer says offline"}'
 ```
 
-Approve a held reply: `GET http://localhost:5678/webhook/approve?id=<ticket>&action=approve&by=<name>`.
+Approve a held reply: `GET http://localhost:5678/webhook/approve?id=<ticket>&action=approve&by=<name>&token=<APPROVAL_TOKEN>`.
+Requests without the token are rejected. The shared token stands in for SSO in this lab, and the approver name is self-reported, so a real deployment would take identity from SSO and keep an audit log.
 Dashboard: http://localhost:13000 (anonymous read-only view is enabled).
 
 ## Homelab profile
@@ -110,6 +116,7 @@ tests/run_demo.py           scenario test: 6 tickets, expected routing
 ## Known limits and next steps
 
 - With only two local models, the judge shares a model family with one of the drafters. A third model family (or the cloud tier) would make arbitration more independent.
+- Agreement between two drafts and a 0.8 confidence threshold are cheap signals, not proof. Confidence is not yet calibrated against a labelled set.
 - SLA targets are simplified to clock hours, so business hours and public holidays are not modelled.
 - Next: email intake (IMAP or Microsoft Graph), Teams alerts for SLA breaches, and evaluation on a larger labelled ticket set.
 

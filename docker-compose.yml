@@ -37,10 +37,11 @@ services:
       N8N_SECURE_COOKIE: "false"
       GENERIC_TIMEZONE: Australia/Melbourne
       TZ: Australia/Melbourne
-      N8N_RUNNERS_ENABLED: "true"
       NODE_FUNCTION_ALLOW_BUILTIN: crypto
       OLLAMA_URL: http://host.docker.internal:11434
       N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      CLOUD_TIER: ${CLOUD_TIER:-off}          # "on" lets the gateway try the cloud model first for judging
+      APPROVAL_TOKEN: ${APPROVAL_TOKEN}
     extra_hosts: ["host.docker.internal:host-gateway"]
     volumes:
       - n8n_data:/home/node/.n8n

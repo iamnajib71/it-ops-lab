@@ -97,6 +97,7 @@ const skip = (model, reason) => attempts.push({ model, attempt: 0, success: fals
 
 for (const model of chainModels) {
   const p = price(model);
+  if (p.tier === 'cloud' && $env.CLOUD_TIER !== 'on') { skip(model, 'skipped: cloud tier disabled (local-only mode)'); continue; }
   if (p.tier === 'cloud' && state.spend_today >= DAILY_CLOUD_BUDGET_USD) { skip(model, 'skipped: daily cloud budget reached'); continue; }
   if ((state.recent_failures[model] || 0) >= CIRCUIT_FAILS) { skip(model, 'skipped: circuit open (repeated failures)'); continue; }
   if ((state.calls_last_min[model] || 0) >= RPM_LIMIT) { skip(model, 'skipped: rate limit'); continue; }
@@ -378,8 +379,10 @@ approval = workflow("itopsApproval001", "Approve or reject a drafted reply", [
           "options": {}}, [0, 0], webhookId="7d3c2f8e-1a4b-4c55-9d1e-approve00001"),
     code("Validate", r"""
 const q = $input.first().json.query || {};
+// Lab stand-in for SSO: approval links carry a shared token from .env (APPROVAL_TOKEN).
+if (!$env.APPROVAL_TOKEN || q.token !== $env.APPROVAL_TOKEN) throw new Error('Invalid or missing approval token');
 const action = q.action === 'approve' ? 'approve' : q.action === 'reject' ? 'reject' : null;
-if (!/^\d+$/.test(q.id || '') || !action) throw new Error('Use ?id=<ticket>&action=approve|reject&by=<name>');
+if (!/^\d+$/.test(q.id || '') || !action) throw new Error('Use ?id=<ticket>&action=approve|reject&by=<name>&token=<token>');
 return [{ json: { id: q.id, action, by: (q.by || 'technician').slice(0, 60) } }];
 """, [220, 0]),
     sql("Record decision", APPROVE_SQL, [440, 0], "={{ JSON.stringify($json) }}",
