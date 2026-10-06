@@ -1,0 +1,14 @@
+[PASS] #1 'Printing from home': P3 printing -> auto_resolved (expected auto_resolved/awaiting_approval), confidence 0.950, 8.9s
+[PASS] #2 'Where is the Finance share?': P3 file_share -> auto_resolved (expected auto_resolved/awaiting_approval), confidence 1.000, 5.8s
+[PASS] #3 'Clicked a link in a weird email': P1 security -> escalated (expected escalated), confidence 1.000, 5.8s
+       held because: security related; P1 needs a human
+[PASS] #4 'Need access to Finance share': P3 file_share -> awaiting_approval (expected awaiting_approval), confidence 1.000, 4.3s
+       held because: access change needs approval
+[PASS] #5 'Nobody can print': P2 printing -> awaiting_approval (expected awaiting_approval/escalated), confidence 1.000, 3.9s
+       held because: P2 needs a human; no valid knowledge base citation
+[PASS] #6 'Payroll login': P2 email -> awaiting_approval (expected awaiting_approval), confidence 1.000, 4.1s
+       held because: contains personal or sensitive data; security related; P2 needs a human
+
+6/6 tickets routed as expected
+{"ok":true,"ticket":"4","status":"approved","by":"Nazmul"}
+{"day":"2026-10-05T13:00:00.000Z","narrative":"6 tickets in total, 2 auto-resolved, 2 awaiting approval, 1 escalated. Email and printing issues common. 27 LLM calls, 6 fallbacks. Estimated cost $0."}
