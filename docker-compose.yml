@@ -1,0 +1,123 @@
+# IT Ops Lab: AI service-desk copilot (n8n + pgvector + Ollama) and a small office homelab.
+# Core stack:    docker compose up -d
+# Plus homelab:  docker compose --profile homelab up -d
+name: it-ops-lab
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+    ports: ["55432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DB}"]
+      interval: 5s
+      retries: 20
+
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports: ["5678:5678"]
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_DATABASE: ${PG_DB}
+      DB_POSTGRESDB_USER: ${PG_USER}
+      DB_POSTGRESDB_PASSWORD: ${PG_PASSWORD}
+      DB_POSTGRESDB_SCHEMA: n8n
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      N8N_SECURE_COOKIE: "false"
+      GENERIC_TIMEZONE: Australia/Melbourne
+      TZ: Australia/Melbourne
+      N8N_RUNNERS_ENABLED: "true"
+      NODE_FUNCTION_ALLOW_BUILTIN: crypto
+      OLLAMA_URL: http://host.docker.internal:11434
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/import/workflows:ro
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    depends_on: [postgres]
+    ports: ["13000:3000"]
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DB: ${PG_DB}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  # ---------------- Homelab (small-office services the copilot supports) ----------------
+  wireguard:
+    image: ghcr.io/wg-easy/wg-easy:14
+    profiles: [homelab]
+    restart: unless-stopped
+    environment:
+      WG_HOST: ${WG_HOST}
+      PASSWORD_HASH: ${WG_PASSWORD_HASH}
+      WG_DEFAULT_DNS: 1.1.1.1
+      WG_ALLOWED_IPS: 10.8.0.0/24, 172.30.0.0/16
+    ports: ["51820:51820/udp", "51821:51821/tcp"]
+    cap_add: [NET_ADMIN, SYS_MODULE]
+    sysctls:
+      net.ipv4.ip_forward: "1"
+      net.ipv4.conf.all.src_valid_mark: "1"
+    volumes: [wg_data:/etc/wireguard]
+
+  fileserver:
+    image: dperson/samba:latest
+    profiles: [homelab]
+    restart: unless-stopped
+    ports: ["1445:445"]
+    command: >
+      -u "alice;${SMB_ALICE_PASSWORD}"
+      -u "bob;${SMB_BOB_PASSWORD}"
+      -s "Public;/shares/public;yes;no;yes;all;none;;Company-wide read/write"
+      -s "Finance;/shares/finance;yes;no;no;alice;none;;Finance team only"
+      -s "Scans;/shares/scans;yes;no;no;alice,bob;none;;Scanner drop folder"
+      -p
+    volumes:
+      - smb_public:/shares/public
+      - smb_finance:/shares/finance
+      - smb_scans:/shares/scans
+
+  printserver:
+    image: olbat/cupsd:latest
+    profiles: [homelab]
+    restart: unless-stopped
+    ports: ["6631:631"]
+    volumes:
+      - ./homelab/cups/cupsd.conf:/etc/cups/cupsd.conf:ro
+      - ./homelab/cups/setup-printers.sh:/setup-printers.sh:ro
+
+  uptime:
+    image: louislam/uptime-kuma:1
+    profiles: [homelab]
+    restart: unless-stopped
+    ports: ["13001:3001"]
+    volumes: [kuma_data:/app/data]
+
+volumes:
+  pgdata:
+  n8n_data:
+  wg_data:
+  smb_public:
+  smb_finance:
+  smb_scans:
+  kuma_data:

@@ -1,0 +1,156 @@
+{
+  "id": "itopsDigest00001",
+  "name": "Daily service desk digest",
+  "nodes": [
+    {
+      "id": "weekdays-5pm",
+      "name": "Weekdays 5pm",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 17 * * 1-5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "today's-stats",
+      "name": "Today's stats",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT json_build_object(\n  'tickets', count(*),\n  'auto_resolved', count(*) FILTER (WHERE status = 'auto_resolved'),\n  'awaiting_approval', count(*) FILTER (WHERE status = 'awaiting_approval'),\n  'escalated', count(*) FILTER (WHERE status = 'escalated'),\n  'by_category', (SELECT coalesce(json_object_agg(category, n), '{}') FROM (SELECT coalesce(category, 'unclassified') AS category, count(*) n FROM tickets\n                   WHERE created_at >= current_date GROUP BY 1) c),\n  'llm_calls', (SELECT count(*) FROM llm_calls WHERE created_at >= current_date AND attempt > 0),\n  'fallbacks', (SELECT count(DISTINCT (ticket_id, task)) FROM llm_calls WHERE created_at >= current_date AND fallback_used),\n  'est_cost_usd', (SELECT coalesce(round(sum(est_cost_usd), 4), 0) FROM llm_calls WHERE created_at >= current_date)\n) AS stats FROM tickets WHERE created_at >= current_date",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "pgItOps",
+          "name": "IT Ops Postgres"
+        }
+      }
+    },
+    {
+      "id": "build-digest-request",
+      "name": "Build digest request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const stats = $input.first().json.stats;\nreturn [{ json: { task: 'digest', json: false, max_tokens: 220, stats,\n  system: 'You write a 4-sentence end-of-day summary for an IT manager. Use only the numbers given. No greetings.',\n  prompt: `Service desk stats for today (JSON): ${JSON.stringify(stats)}` } }];"
+      }
+    },
+    {
+      "id": "gateway:-digest",
+      "name": "Gateway: digest",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "itopsGateway001",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "save-digest",
+      "name": "Save digest",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO daily_digests (day, stats, narrative) VALUES (current_date, $1::jsonb->'stats', $1::jsonb->>'narrative')\nON CONFLICT (day) DO UPDATE SET stats = EXCLUDED.stats, narrative = EXCLUDED.narrative, created_at = now()\nRETURNING day, narrative",
+        "options": {
+          "queryReplacement": "={{ JSON.stringify({ stats: $('Build digest request').first().json.stats, narrative: $json.content || 'Digest model unavailable.' }) }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "pgItOps",
+          "name": "IT Ops Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Weekdays 5pm": {
+      "main": [
+        [
+          {
+            "node": "Today's stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Today's stats": {
+      "main": [
+        [
+          {
+            "node": "Build digest request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build digest request": {
+      "main": [
+        [
+          {
+            "node": "Gateway: digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gateway: digest": {
+      "main": [
+        [
+          {
+            "node": "Save digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "pinData": {}
+}

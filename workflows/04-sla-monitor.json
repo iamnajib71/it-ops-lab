@@ -1,0 +1,91 @@
+{
+  "id": "itopsSlaMonitor1",
+  "name": "SLA monitor (every 5 minutes)",
+  "nodes": [
+    {
+      "id": "every-5-minutes",
+      "name": "Every 5 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "flag-at-risk-tickets",
+      "name": "Flag at-risk tickets",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tickets SET sla_alerted = true\nWHERE status IN ('new', 'awaiting_approval', 'escalated') AND NOT sla_alerted\n  AND sla_due_at < now() + interval '30 minutes'\nRETURNING id, priority, subject, status, sla_due_at, (sla_due_at < now()) AS breached",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "pgItOps",
+          "name": "IT Ops Postgres"
+        }
+      }
+    },
+    {
+      "id": "format-alert",
+      "name": "Format alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// In production this feeds Teams/Slack/email; the lab records the alert in the execution log.\nreturn $input.all().filter(i => i.json.id).map(i => ({ json: {\n  alert: `${i.json.breached ? 'BREACHED' : 'At risk'}: #${i.json.id} ${i.json.priority} \"${i.json.subject}\" (${i.json.status}) due ${i.json.sla_due_at}`,\n} }));"
+      }
+    }
+  ],
+  "connections": {
+    "Every 5 minutes": {
+      "main": [
+        [
+          {
+            "node": "Flag at-risk tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag at-risk tickets": {
+      "main": [
+        [
+          {
+            "node": "Format alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "pinData": {}
+}

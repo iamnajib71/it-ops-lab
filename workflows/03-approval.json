@@ -1,0 +1,115 @@
+{
+  "id": "itopsApproval001",
+  "name": "Approve or reject a drafted reply",
+  "nodes": [
+    {
+      "id": "approval-link",
+      "name": "Approval link",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "approve",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "webhookId": "7d3c2f8e-1a4b-4c55-9d1e-approve00001"
+    },
+    {
+      "id": "validate",
+      "name": "Validate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const q = $input.first().json.query || {};\nconst action = q.action === 'approve' ? 'approve' : q.action === 'reject' ? 'reject' : null;\nif (!/^\\d+$/.test(q.id || '') || !action) throw new Error('Use ?id=<ticket>&action=approve|reject&by=<name>');\nreturn [{ json: { id: q.id, action, by: (q.by || 'technician').slice(0, 60) } }];"
+      }
+    },
+    {
+      "id": "record-decision",
+      "name": "Record decision",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tickets SET status = CASE WHEN $1::jsonb->>'action' = 'approve' THEN 'approved' ELSE 'rejected' END,\n  approved_by = $1::jsonb->>'by', resolved_at = CASE WHEN $1::jsonb->>'action' = 'approve' THEN now() END\nWHERE id = ($1::jsonb->>'id')::bigint AND status IN ('awaiting_approval', 'escalated')\nRETURNING id, status, approved_by, draft_reply",
+        "options": {
+          "queryReplacement": "={{ JSON.stringify($json) }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "pgItOps",
+          "name": "IT Ops Postgres"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "result",
+      "name": "Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const r = $input.first().json;\nreturn [{ json: r.id ? { ok: true, ticket: r.id, status: r.status, by: r.approved_by }\n                     : { ok: false, message: 'Ticket not found or not awaiting approval' } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Approval link": {
+      "main": [
+        [
+          {
+            "node": "Validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate": {
+      "main": [
+        [
+          {
+            "node": "Record decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record decision": {
+      "main": [
+        [
+          {
+            "node": "Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "pinData": {}
+}

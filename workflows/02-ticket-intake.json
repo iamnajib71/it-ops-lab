@@ -1,0 +1,397 @@
+{
+  "id": "itopsIntake00001",
+  "name": "Ticket intake (triage, hybrid RAG, arbitration, policy gate)",
+  "nodes": [
+    {
+      "id": "new-ticket",
+      "name": "New ticket",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ticket",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "7d3c2f8e-1a4b-4c55-9d1e-ticket000001"
+    },
+    {
+      "id": "normalise-and-pii-check",
+      "name": "Normalise and PII check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Normalise the request and detect personal/sensitive data before any model sees it.\nconst b = $input.first().json.body || $input.first().json;\nconst text = `${b.subject || ''}\\n${b.body || b.description || ''}`.trim();\nconst PII = {\n  card: /\\b(?:\\d[ -]?){13,16}\\b/,\n  tfn: /\\b\\d{3}[ -]?\\d{3}[ -]?\\d{3}\\b/,\n  password: /\\b(password|passcode|pwd)\\s*(is|:|=)\\s*\\S+/i,\n  dob: /\\b(dob|date of birth)\\b/i,\n  medicare: /\\bmedicare\\b/i,\n};\nconst hits = Object.entries(PII).filter(([, re]) => re.test(text)).map(([k]) => k);\nconst redacted = String(b.body || b.description || '')\n  .replace(PII.card, '[REDACTED-NUMBER]')\n  .replace(PII.tfn, '[REDACTED-NUMBER]')\n  .replace(PII.password, '$1 $2 [REDACTED]');\nreturn [{ json: {\n  requester_name: b.name || 'Unknown', requester_email: b.email || null, channel: b.channel || 'webhook',\n  subject: (b.subject || text.slice(0, 80)).slice(0, 200), body: redacted,\n  contains_pii: hits.length > 0, pii_types: hits,\n} }];"
+      }
+    },
+    {
+      "id": "insert-ticket",
+      "name": "Insert ticket",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        400,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO tickets (requester_name, requester_email, channel, subject, body, contains_pii)\nSELECT x.requester_name, x.requester_email, x.channel, x.subject, x.body, x.contains_pii\nFROM jsonb_to_record($1::jsonb) AS x(requester_name text, requester_email text, channel text, subject text, body text, contains_pii boolean)\nRETURNING id",
+        "options": {
+          "queryReplacement": "={{ JSON.stringify($json) }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "pgItOps",
+          "name": "IT Ops Postgres"
+        }
+      }
+    },
+    {
+      "id": "build-classify-request",
+      "name": "Build classify request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const t = $('Normalise and PII check').first().json;\nconst ticket_id = $input.first().json.id;\nreturn [{ json: {\n  task: 'classify', json: true, ticket_id, max_tokens: 200,\n  system: `You triage IT service desk tickets for a small office. Reply with JSON only:\n{\"category\": one of [\"access\",\"vpn\",\"network\",\"printing\",\"file_share\",\"email\",\"hardware\",\"software\",\"security\",\"onboarding\",\"other\"],\n \"priority\": one of [\"P1\",\"P2\",\"P3\",\"P4\"],\n \"summary\": \"max 20 words\",\n \"security_risk\": true|false}\nPriority guide: P1 business down or security incident (outage, compromised account, phishing clicked, lost device).\nP2 team or service degraded (several users affected). P3 single user issue. P4 request or how-to question.`,\n  prompt: `Subject: ${t.subject}\\n\\n${t.body}`,\n} }];"
+      }
+    },
+    {
+      "id": "gateway:-classify",
+      "name": "Gateway: classify",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        0
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "itopsGateway001",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "retrieve-kb",
+      "name": "Retrieve KB",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Embed the ticket text and fetch the best knowledge base sections with hybrid search (RRF).\nconst t = $('Normalise and PII check').first().json;\nconst OLLAMA = $env.OLLAMA_URL || 'http://host.docker.internal:11434';\nconst q = `${t.subject}\\n${t.body}`;\nconst res = await this.helpers.httpRequest({ method: 'POST', url: `${OLLAMA}/api/embed`, json: true,\n  body: { model: 'nomic-embed-text', input: 'search_query: ' + q } });\nreturn [{ json: { q, vec: JSON.stringify(res.embeddings[0]), triage: $input.first().json } }];"
+      }
+    },
+    {
+      "id": "hybrid-search",
+      "name": "Hybrid search",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1200,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT doc_id, coalesce(section,'') AS section, content, rrf, kw_rank, vec_rank FROM kb_hybrid_search($1::jsonb->>'q', ($1::jsonb->>'vec')::vector, 4)",
+        "options": {
+          "queryReplacement": "={{ JSON.stringify({ q: $json.q, vec: $json.vec }) }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "pgItOps",
+          "name": "IT Ops Postgres"
+        }
+      }
+    },
+    {
+      "id": "build-draft-requests",
+      "name": "Build draft requests",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Build the same grounded prompt for two different models (A and B) so a judge can arbitrate.\nconst t = $('Normalise and PII check').first().json;\nconst ticket_id = $('Insert ticket').first().json.id;\nconst triage = $('Retrieve KB').first().json.triage;\nconst kb = $input.all().map(i => i.json);\nconst context = kb.map(k => `[${k.doc_id}#${k.section}]\\n${k.content}`).join('\\n\\n');\nconst system = `You are an IT service desk analyst replying to a staff member.\nUse ONLY the knowledge base excerpts provided, and only the steps that apply to this person's exact problem\n(skip advice meant for other situations, e.g. lost devices or other services). Give short numbered steps. Cite every step with its source tag\nexactly as written, e.g. [vpn-wireguard#Troubleshooting]. If the excerpts do not cover the issue, say a technician\nwill follow up and do not guess. Max 140 words. Reply with JSON only: {\"reply\": \"...\", \"citations\": [\"doc#section\", ...]}`;\nconst prompt = `Ticket (${triage.parsed?.priority || '?'}, ${triage.parsed?.category || '?'}):\\nSubject: ${t.subject}\\n${t.body}\\n\\nKnowledge base excerpts:\\n${context}`;\nconst base = { json: true, ticket_id, system, prompt, max_tokens: 450 };\nreturn [{ json: { ...base, task: 'draft_a' } }, { json: { ...base, task: 'draft_b' } }];"
+      }
+    },
+    {
+      "id": "gateway:-drafts-a-and-b",
+      "name": "Gateway: drafts A and B",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        0
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "itopsGateway001",
+          "mode": "id"
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "build-judge-request",
+      "name": "Build judge request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Blind arbitration: the judge sees two anonymous drafts plus the evidence, and must check grounding.\nconst drafts = $input.all().map(i => i.json);\nconst a = drafts.find(d => d.task === 'draft_a') || drafts[0];\nconst b = drafts.find(d => d.task === 'draft_b') || drafts[1] || drafts[0];\nconst kb = $('Hybrid search').all().map(i => i.json);\nconst t = $('Normalise and PII check').first().json;\nconst context = kb.map(k => `[${k.doc_id}#${k.section}]\\n${k.content}`).join('\\n\\n');\nconst show = d => d && d.ok ? (d.parsed?.reply || d.content) : '(no draft: model failed)';\nreturn [{ json: {\n  task: 'judge', json: true, ticket_id: $('Insert ticket').first().json.id, max_tokens: 300, temperature: 0,\n  system: `You are a strict reviewer of IT support replies. Compare Draft A and Draft B against the evidence.\nA reply is grounded only if every instruction appears in the evidence AND applies to this ticket's situation\n(advice copied from an unrelated situation counts as unsupported). Be strict: confidence above 0.8 only if the\nbetter draft is fully grounded, relevant, and would resolve the issue without a technician. Reply with JSON only:\n{\"winner\": \"A\" or \"B\", \"grounded\": true|false, \"unsupported_claims\": [\"...\"], \"confidence\": number 0..1, \"reason\": \"one sentence\"}`,\n  prompt: `Ticket: ${t.subject}\\n${t.body}\\n\\nEvidence:\\n${context}\\n\\nDraft A:\\n${show(a)}\\n\\nDraft B:\\n${show(b)}`,\n  drafts: { A: { model: a?.model, ok: a?.ok, reply: a?.parsed?.reply, citations: a?.parsed?.citations || [] },\n            B: { model: b?.model, ok: b?.ok, reply: b?.parsed?.reply, citations: b?.parsed?.citations || [] } },\n} }];"
+      }
+    },
+    {
+      "id": "gateway:-judge",
+      "name": "Gateway: judge",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2000,
+        0
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "itopsGateway001",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "policy-gate",
+      "name": "Policy gate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Policy gate (mirrors kb/service-desk-policy.md): auto-send only low-risk, confident, grounded P3/P4 answers.\nconst t = $('Normalise and PII check').first().json;\nconst ticket_id = $('Insert ticket').first().json.id;\nconst triage = $('Retrieve KB').first().json.triage.parsed || {};\nconst judgeRun = $input.first().json;\nconst j = judgeRun.parsed || {};\nconst drafts = $('Build judge request').first().json.drafts;\nconst kb = $('Hybrid search').all().map(i => `${i.json.doc_id}#${i.json.section}`);\nconst pick = j.winner === 'B' && drafts.B.ok ? drafts.B : (drafts.A.ok ? drafts.A : drafts.B);\n// Small models often under-escape Windows paths in JSON (\"\\f\" becomes a form feed): restore UNC paths.\nconst cleanReply = s => (s || '').replace(/\\f/g, '\\\\f').replace(/(^|[^\\\\])\\\\(fileserver)/g, '$1\\\\\\\\$2');\n\n// Deterministic checks that do not rely on any model.\nconst cites = (pick.citations || []).filter(c => kb.includes(String(c).replace(/^\\[|\\]$/g, '')));\nconst citationsValid = cites.length > 0;\nconst priority = ['P1','P2','P3','P4'].includes(triage.priority) ? triage.priority : 'P2';\nconst category = triage.category || 'other';\nconst confidence = Math.max(0, Math.min(1, Number(j.confidence) || 0));\n\nconst reasons = [];\nif (!judgeRun.ok) reasons.push('judge unavailable');\nif (t.contains_pii) reasons.push('contains personal or sensitive data');\nif (triage.security_risk || category === 'security') reasons.push('security related');\n// Rule-based backstop: access/permission requests always need approval, whatever the model's category.\nconst accessAsk = /\\b(need|get|request|grant|give|add)\\b[^.]{0,40}\\b(access|permissions?)\\b|\\bpermissions? to\\b/i.test(`${t.subject} ${t.body}`);\nif (category === 'access' || category === 'onboarding' || accessAsk) reasons.push('access change needs approval');\nif (!['P3','P4'].includes(priority)) reasons.push(`${priority} needs a human`);\nif (!j.grounded) reasons.push('judge found unsupported content');\nif (!citationsValid) reasons.push('no valid knowledge base citation');\nif (confidence < 0.8) reasons.push(`confidence ${confidence.toFixed(2)} below 0.80`);\n// Cross-model agreement: two independent drafts should rely on the same article.\nconst docs = d => new Set((d.citations || []).map(c => String(c).replace(/^\\[/, '').split('#')[0]));\nconst agree = drafts.A.ok && drafts.B.ok && [...docs(drafts.A)].some(x => docs(drafts.B).has(x));\nif (!agree) reasons.push('drafts disagree on the source article');\n\nconst status = priority === 'P1' || category === 'security' ? 'escalated'\n  : reasons.length === 0 ? 'auto_resolved' : 'awaiting_approval';\nconst hours = { P1: 4, P2: 8, P3: 24, P4: 40 }[priority];   // business-hour targets, simplified to clock hours\n\nreturn [{ json: {\n  id: ticket_id, category, priority, summary: triage.summary || null, status,\n  draft_reply: cleanReply(pick.reply) || null, citations: cites, confidence,\n  judge_verdict: { winner: j.winner, grounded: !!j.grounded, unsupported_claims: j.unsupported_claims || [],\n                   reason: j.reason || null, judge_model: judgeRun.model, draft_models: { A: drafts.A.model, B: drafts.B.model },\n                   gate_reasons: reasons },\n  sla_hours: hours,\n} }];"
+      }
+    },
+    {
+      "id": "update-ticket",
+      "name": "Update ticket",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2400,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tickets t SET category = x.category, priority = x.priority, summary = x.summary, status = x.status,\n  draft_reply = x.draft_reply, citations = x.citations, confidence = x.confidence, judge_verdict = x.judge_verdict,\n  sla_due_at = t.created_at + make_interval(hours => x.sla_hours),\n  resolved_at = CASE WHEN x.status = 'auto_resolved' THEN now() END\nFROM jsonb_to_record($1::jsonb) AS x(id bigint, category text, priority text, summary text, status text, draft_reply text,\n  citations jsonb, confidence numeric, judge_verdict jsonb, sla_hours int)\nWHERE t.id = x.id\nRETURNING t.id, t.status, t.priority, t.category, t.summary, t.confidence, t.draft_reply, t.citations, t.judge_verdict, t.sla_due_at",
+        "options": {
+          "queryReplacement": "={{ JSON.stringify($json) }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "pgItOps",
+          "name": "IT Ops Postgres"
+        }
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2600,
+        0
+      ],
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "New ticket": {
+      "main": [
+        [
+          {
+            "node": "Normalise and PII check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise and PII check": {
+      "main": [
+        [
+          {
+            "node": "Insert ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert ticket": {
+      "main": [
+        [
+          {
+            "node": "Build classify request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build classify request": {
+      "main": [
+        [
+          {
+            "node": "Gateway: classify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gateway: classify": {
+      "main": [
+        [
+          {
+            "node": "Retrieve KB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve KB": {
+      "main": [
+        [
+          {
+            "node": "Hybrid search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hybrid search": {
+      "main": [
+        [
+          {
+            "node": "Build draft requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build draft requests": {
+      "main": [
+        [
+          {
+            "node": "Gateway: drafts A and B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gateway: drafts A and B": {
+      "main": [
+        [
+          {
+            "node": "Build judge request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build judge request": {
+      "main": [
+        [
+          {
+            "node": "Gateway: judge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gateway: judge": {
+      "main": [
+        [
+          {
+            "node": "Policy gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policy gate": {
+      "main": [
+        [
+          {
+            "node": "Update ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update ticket": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "pinData": {}
+}
