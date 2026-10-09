@@ -47,6 +47,8 @@ def main():
         for row in result['questions']:
             row['checks']=checks(row['answer'],labels[row['id']]['gold_article_ids'],row['context'])
         result['summary']=summarize(result['questions']); result['mode']='cached checks replay'
+        result['source_provenance']=result['provenance']
+        result['provenance']=provenance()
     else:
         result={'provenance':provenance(),'mode':'live','variant':args.variant,'metric_protocol':'v2: article membership separate from exact tags; explicit refusal separate from citation-free refusal',
                 'models':{'answer':'qwen2.5:3b','judge':'llama3.1:8b'},'runtime':model_manifest(),'questions':[]}
