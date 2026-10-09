@@ -1,0 +1,12 @@
+[PASS] #7 'Printing from home': P3 printing -> auto_resolved (expected auto_resolved/awaiting_approval), confidence 1.000, 32.0s
+[PASS] #8 'Where is the Finance share?': P3 file_share -> auto_resolved (expected auto_resolved/awaiting_approval), confidence 1.000, 12.6s
+[PASS] #9 'Clicked a link in a weird email': P1 security -> escalated (expected escalated), confidence 1.000, 8.5s
+       held because: security related; P1 needs a human
+[PASS] #10 'Need access to Finance share': P3 file_share -> awaiting_approval (expected awaiting_approval), confidence 1.000, 4.6s
+       held because: access change needs approval; drafts disagree on the source article
+[PASS] #11 'Nobody can print': P2 printing -> awaiting_approval (expected awaiting_approval/escalated), confidence 0.950, 4.6s
+       held because: P2 needs a human
+[PASS] #12 'Payroll login': P2 email -> awaiting_approval (expected awaiting_approval), confidence 1.000, 3.3s
+       held because: contains personal or sensitive data; security related; P2 needs a human; drafts disagree on the source article
+
+6/6 tickets routed as expected

@@ -5,7 +5,7 @@ name: it-ops-lab
 
 services:
   postgres:
-    image: pgvector/pgvector:pg16
+    image: pgvector/pgvector@sha256:7b822b0aac60967beb1ea5e576b8602c94c300a157d187f385ae3e0da199b90a
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${PG_USER}
@@ -21,7 +21,7 @@ services:
       retries: 20
 
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n@sha256:bcef56dd44014e09774219536a3f8cb07f1b553fcba94044bd9fc0f21f8676a3
     restart: unless-stopped
     depends_on:
       postgres: { condition: service_healthy }
@@ -41,6 +41,8 @@ services:
       OLLAMA_URL: http://host.docker.internal:11434
       N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
       CLOUD_TIER: ${CLOUD_TIER:-off}          # "on" lets the gateway try the cloud model first for judging
+      RAG_MEASURED: ${RAG_MEASURED:-off}
+      RAG_VARIANT: ${RAG_VARIANT:-keyword}
       APPROVAL_TOKEN: ${APPROVAL_TOKEN}
     extra_hosts: ["host.docker.internal:host-gateway"]
     volumes:
@@ -48,7 +50,7 @@ services:
       - ./workflows:/import/workflows:ro
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana@sha256:b28bae15e219c998fb0e0424ed724930cc61b1f61fb404d47c862f9a23f9e572
     restart: unless-stopped
     depends_on: [postgres]
     ports: ["13000:3000"]

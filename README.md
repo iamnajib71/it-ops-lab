@@ -1,123 +1,223 @@
-# IT Ops Lab: AI service-desk copilot
+**IT Ops Lab: a local service-desk copilot with measured retrieval, auditable answers and a regression gate.**
 
-A self-hosted lab that shows how a small IT team can answer routine tickets faster **without letting AI make risky decisions**.
-Tickets come in through a webhook, an n8n pipeline triages them, finds the right knowledge base article with hybrid search,
-writes two candidate replies with two different local models, has a third call judge them, and then a rule-based policy gate
-decides whether the reply can go out automatically or must wait for a technician. Every model call goes through one gateway
-that handles routing, retries, fallback, rate limits, a cloud budget and a circuit breaker, and logs cost and latency to Postgres
-for a Grafana dashboard.
+![Real ticket demo and evaluation checks](docs/demo.gif)
 
-Everything runs locally on Docker and Ollama. By default (`CLOUD_TIER=off`) no ticket data leaves the machine. If the optional
-cloud tier is switched on, only the redacted ticket text and the retrieved KB excerpts are sent, and only for the judging step.
+[![CI](https://github.com/iamnajib71/it-ops-lab/actions/workflows/eval.yml/badge.svg)](https://github.com/iamnajib71/it-ops-lab/actions/workflows/eval.yml)
+[![MIT licence](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
+![Python](https://img.shields.io/badge/main_language-Python-blue)
 
-**For hiring managers:** this repo is about service desk judgement more than AI. Start with *Why the gate is rule-based* below
-(two real failures I caught in testing and how I fixed them), the KB articles in `kb/`, and the SLA and escalation policy in
-`kb/service-desk-policy.md`. For hands-on support work (VPN, file and print servers, AD account tasks, worked tickets),
-see the companion [IT Support Homelab](https://github.com/iamnajib71/it-support-homelab).
+**Runs locally.** The GIF records real n8n ticket processing, cached evaluation and
+pytest output; playback is compressed to about a minute. Fictional tickets only.
+Docker, Postgres, n8n and local Ollama models provide the complete demo.
 
-![Service desk copilot dashboard](docs/img/grafana-dashboard.png)
+## What it shows recruiters
 
-## What it demonstrates
-
-| Area | In this repo |
-|---|---|
-| Service desk practice | P1–P4 priorities and SLA targets, escalation rules, approval queue, SLA breach monitor, end-of-day digest (`kb/service-desk-policy.md`) |
-| Knowledge management | 8 user-facing KB articles (VPN, file shares, printing, MFA, Wi-Fi, email, onboarding/offboarding) |
-| Automation (n8n) | 6 workflows: gateway sub-workflow, ticket intake, approval link, SLA monitor, scheduled and on-demand digests |
-| RAG with hybrid search | pgvector (768-d `nomic-embed-text`) + Postgres full-text search merged with Reciprocal Rank Fusion in SQL (`db/init.sql`) |
-| LLM gateway | per-task model routing, retries, fallback chain, per-model rate limit, daily cloud budget ("cost autopilot"), circuit breaker, per-attempt telemetry |
-| Output arbitration | two drafts from different models, blind judge, plus deterministic checks (citations must match retrieved sections, both drafts must cite the same article) |
-| Risk controls | PII detection and redaction before any model sees the text, security and access requests always go to a human |
-| Observability | Grafana dashboard provisioned as code: outcomes, fallback rate, latency by model, gateway events, approval queue |
-| Testing | `tests/run_demo.py` is a smoke test: 6 realistic tickets, each checked against its expected queue (6/6 in `docs/demo-run.txt`). It is not a full evaluation |
+- Evaluation discipline: 70 labelled questions, four retrieval variants, raw per-question evidence, dev/test splits and baseline-derived CI gates.
+- AI automation engineering: n8n ticket intake, local retrieval/reranking behind a flag, two drafts, judge review and a deterministic human approval gate.
+- Service desk judgement: VPN, shares, print, MFA and onboarding runbooks; P1/P2 escalation, access approval and sensitive-data redaction.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  U[Staff member / form / email bridge] -->|POST /webhook/ticket| I
-  subgraph n8n
-    I[Normalise + PII redaction] --> C[Classify: category, P1-P4]
-    C --> R[Hybrid search: vector + keyword, RRF]
-    R --> D[Draft A and Draft B]
-    D --> J[Blind judge]
-    J --> G{Policy gate}
-    GW[[LLM Gateway sub-workflow:<br/>routing, retries, fallback,<br/>rate limit, budget, circuit breaker]]
-  end
-  C & D & J -.-> GW
-  GW -.-> O[(Ollama: qwen2.5:3b, llama3.1:8b<br/>cloud tier optional)]
-  G -->|low-risk, grounded, confident P3/P4| A[Auto-resolved]
-  G -->|access, PII, P2, low confidence| Q[Approval queue]
-  G -->|P1 or security| E[Escalated]
-  Q -->|GET /webhook/approve| H[Technician approves or rejects]
-  PG[(Postgres + pgvector:<br/>tickets, kb_chunks, llm_calls)] --- n8n
-  PG --> GF[Grafana dashboard]
+  T[Fictional ticket webhook] --> P[Normalize and redact]
+  P --> C[Local triage]
+  C --> F{RAG_MEASURED flag}
+  F -->|off: original path| H[Keyword + vector RRF]
+  F -->|on: dev winner| K[Keyword retrieval]
+  F -->|on: variant reranked| R[RRF top 20 + local reranker]
+  H & K & R --> D[Four chunks: two local drafts]
+  D --> J[Local blind judge]
+  J --> G{Deterministic policy gate}
+  G --> A[Auto reply / human approval / escalation]
+  PG[(Postgres + pgvector)] --- H & K & R
+  PG --> GF[Grafana telemetry]
+  KB[Committed KB] --> E[70 labelled questions]
+  E --> V[Live eval: rankings + drafts + judge]
+  V --> X[Raw JSON + embedding fixture]
+  X --> CI[Windows CI: replay + pytest gate]
 ```
 
-### Why the gate is rule-based
+## Screenshots
 
-Models are good at drafting and bad at knowing when they are wrong. In the first test run the judge rated a reply as fully
-supported even though it told a user with a VPN problem to "raise a P1 ticket" (advice from the lost-device section). So the
-final decision is made by code that mirrors the written policy, not by a model:
+![Real local ticket and regression test output](docs/img/demo-terminal.png)
 
-- P1 and security tickets are escalated, P2 always needs a person.
-- Any access or permission change needs approval. A regex backstop catches these even when the model labels them as something else (this was a real miss in testing).
-- Tickets with personal or sensitive data are redacted and held.
-- A reply is sent automatically (status `auto_resolved` means "reply sent", not "fixed") only if the judge says it is grounded, confidence is at least 0.8, it cites a section that was actually retrieved, and both independent drafts relied on the same article.
+![Measured retrieval coverage](docs/img/retrieval-results.png)
 
-### Gateway behaviour you can see in the dashboard
+![Grafana service desk dashboard](docs/img/grafana-dashboard.png)
 
-With `CLOUD_TIER=on` (as in the screenshot), the judge's first choice is a cloud model. On a free plan it returns HTTP 402, so the gateway records the failure and falls back
-to `llama3.1:8b`. After three failures in ten minutes the circuit opens and the cloud model is skipped without a network call.
-Once the daily cloud budget is spent it is skipped too. Local models cost $0, and cloud prices in `model_prices` are illustrative.
+The dashboard screenshot is from the original lab and includes historical cloud
+fallback telemetry. The current judge route and evaluations use local models only.
 
-## Run it
+## Quick start (Windows PowerShell)
 
-Prerequisites: Docker Desktop, [Ollama](https://ollama.com) with `nomic-embed-text`, `qwen2.5:3b` and `llama3.1:8b` pulled, Python 3.10+.
+Prerequisites: Git, Python 3.10+, Docker Desktop running with its Linux engine,
+and [Ollama](https://ollama.com) running. Allow disk space for three local models.
+Ports 55432, 5678 and 13000 must be available.
 
-```bash
-cp .env.example .env            # fill in passwords
-docker compose up -d            # postgres :55432, n8n :5678, grafana :13000
-python scripts/ingest_kb.py     # chunk, embed and load the KB
-python scripts/build_workflows.py
-docker compose exec n8n n8n import:workflow --separate --input=/import/workflows
-# publish the workflows in the n8n UI (or n8n publish:workflow --id=...), then:
-python tests/run_demo.py
+```powershell
+git clone https://github.com/iamnajib71/it-ops-lab.git
+Set-Location it-ops-lab
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+ollama pull nomic-embed-text
+ollama pull qwen2.5:3b
+ollama pull llama3.1:8b
+.\.venv\Scripts\python.exe scripts/setup_lab.py --measured
+.\.venv\Scripts\python.exe tests/run_demo.py
+.\.venv\Scripts\python.exe eval/run_retrieval.py
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Try a ticket yourself:
+Setup generates ignored local `.env` credentials, starts digest-pinned images,
+applies the schema, embeds the KB, imports the Postgres credential and six
+workflows, publishes them and waits for n8n. No credentials are committed.
+The demo checks routing, not whether a user's problem was actually fixed.
 
-```bash
-curl -X POST localhost:5678/webhook/ticket -H "Content-Type: application/json" \
-  -d '{"name":"Sam","subject":"Printer offline","body":"My print job is stuck and the printer says offline"}'
+Open n8n at http://localhost:5678 (create a local owner account for the editor)
+and the read-only dashboard at http://localhost:13000. Approvals use a lab shared
+token from `.env`; this is a stand-in for SSO, not production identity verification.
+
+### Feature flag and rollback
+
+`--measured` writes `RAG_MEASURED=on` and `RAG_VARIANT=keyword`, the measured dev
+winner. Set `RAG_VARIANT=reranked` to exercise RRF plus the local qwen reranker;
+`vector` and `hybrid` are also supported. After editing `.env` run
+`docker compose up -d n8n`. Set `RAG_MEASURED=off` to restore the old hybrid path.
+Invalid reranker output visibly falls back to hybrid; the ticket's judge verdict
+records `retrieval_mode` and `rerank_error`. Empty keyword results become an
+empty evidence context rather than stopping the workflow.
+
+## Results and evidence
+
+Real local run: 2026-10-09 UTC. Eight articles, 18 chunks,
+60 answerable questions plus ten no-answer questions. Recall uses the top five
+chunks, deduplicating article IDs. MRR and nDCG are article-based; see the
+[full protocol](eval/README.md) for the exact definitions.
+
+| Variant | Recall@5 | MRR | nDCG@5 |
+|---|---:|---:|---:|
+| Keyword (Postgres) | 0.9861 | 0.8750 | 0.8957 |
+| Vector (nomic-embed-text) | 0.9528 | 0.9196 | 0.9162 |
+| Hybrid (RRF) | 0.9778 | 0.9408 | 0.9416 |
+| Hybrid + local LLM reranker | 0.9028 | 0.8837 | 0.8688 |
+
+
+The table describes all 60 answerable questions. Selection uses the 40 dev
+questions only: dev recall@5, then MRR, then nDCG, with ties favouring simpler
+variants. Keyword wins dev recall@5 (0.9792); hybrid has better
+MRR. The held-out 20-question recall@5 is keyword 1.0000,
+vector 0.9750, hybrid 1.0000, reranked 0.9250.
+
+**The reranker did not help.** It reduced coverage and first-hit ranking, and
+23/70 calls produced invalid ID permutations and used hybrid fallback.
+The feature flag exposes it for inspection, but the measured configuration
+selects keyword rather than promoting an unsuccessful experiment.
+
+| Answer check (keyword; one local draft) | Measured score |
+|---|---:|
+| Exact inline citation present (60 answerable) | 0.0500 |
+| Cited article in gold set (60 answerable) | 0.6833 |
+| Citation tags match retrieved sections (60 answerable) | 0.6000 |
+| Local judge faithfulness (60 answerable) | 0.8833 |
+| Explicit no-answer abstention (10 questions) | 0.7000 |
+| Citation-free abstention (10 questions) | 0.1000 |
+| Answered rather than refused (60 answerable) | 0.9000 |
+| Judge-rated abstention (10 questions) | 0.7000 |
+
+
+Answer generation uses local `qwen2.5:3b`; the second-stage judge is local
+`llama3.1:8b`. Citations are checked before judging. Judge scores are model
+opinions, not human-certified correctness. This controlled single-draft experiment
+is separate from production's two-draft arbitration and policy gate.
+
+Raw evidence: [retrieval report](eval/results/20261009T125904Z-retrieval.json),
+[answer report](eval/results/20261009T125908Z-answers.json), [all historical reports](eval/results),
+[cached embeddings and raw model responses](eval/fixtures),
+[original hybrid demo output](docs/demo-hybrid.txt).
+Reports preserve commit hashes, dirty-tree status, input hashes, model digests and
+UTC dates. Initial measurements were made on the identified dirty working tree;
+their exact inputs and raw responses are retained. Capture resumes identical
+model inputs and preserves capture history.
+
+### Regression gate and re-run
+
+Dev baseline: keyword recall@5 0.9792, no-answer abstention
+0.7143. CI fails below recall@5 **0.9592** or
+abstention **0.7143**. The recall allowance is two percentage
+points; abstention permits no lost dev refusals. Thresholds and source reports
+are committed in [baseline.json](eval/baseline.json).
+
+```powershell
+# Fast offline replay; no Docker or model downloads required
+.\.venv\Scripts\python.exe eval/run_retrieval.py
+.\.venv\Scripts\python.exe eval/run_answers.py --variant keyword
+.\.venv\Scripts\python.exe -m pytest -q
+
+# Live measurements against the local lab
+.\.venv\Scripts\python.exe eval/run_retrieval.py --live
+.\.venv\Scripts\python.exe eval/verify_sql.py
+.\.venv\Scripts\python.exe eval/run_answers.py --live --variant keyword
+# For a different candidate: --variant hybrid or --variant reranked
 ```
 
-Approve a held reply: `GET http://localhost:5678/webhook/approve?id=<ticket>&action=approve&by=<name>&token=<APPROVAL_TOKEN>`.
-Requests without the token are rejected. The shared token stands in for SSO in this lab, and the approver name is self-reported, so a real deployment would take identity from SSO and keep an audit log.
-Dashboard: http://localhost:13000 (anonymous read-only view is enabled).
+CI recomputes vector cosine, RRF, retrieval metrics and answer checks from real
+cached fixtures. It also verifies generated workflow exports and runs unit tests.
+Cached Postgres ranks and LLM responses do not measure SQL or model drift; input
+hash changes fail until fixtures are deliberately refreshed. `verify_sql.py`
+checked all 70 hybrid rankings against production SQL successfully.
 
-## The office it supports
+### What I learned
 
-The VPN, file server, print server and Active Directory that these KB articles describe are built and tested in a separate repo,
-[IT Support Homelab](https://github.com/iamnajib71/it-support-homelab), with three worked support cases and a runbook.
+- More model calls did not make retrieval better. Validation caught malformed
+  rankings, but even valid reranking reduced recall on this small KB.
+- The winner depends on the stated objective: keyword covers more gold articles,
+  while hybrid puts relevant evidence first more often. I kept that tradeoff visible.
+- Citation membership is a useful cheap check, but groundedness and refusal need
+  separate measurements; neither a citation nor an LLM judge proves correctness.
+  For example, the judge accepted q003's extra connectivity advice as helpful
+  despite the question already stating that the handshake works. Manual review
+  remains necessary. Refusals with unrelated citation metadata are also exposed
+  by the separate citation-free abstention score.
 
-## Layout
+## Project structure
 
+```text
+kb/                         Eight committed support articles
+db/init.sql                 pgvector, keyword/RRF retrieval, tickets and telemetry
+scripts/ingest_kb.py         Section chunks + local nomic embeddings
+scripts/build_workflows.py  Reviewable prompts, SQL, routing and policy gate
+scripts/setup_lab.py        Reproducible local setup without committed secrets
+workflows/                  Six generated n8n exports
+eval/questions.jsonl        70 labelled questions and gold answers
+eval/prompts/               Committed reranker and judge prompts
+eval/run_retrieval.py        Four-way live capture or cached replay
+eval/run_answers.py          Citation checks, local drafts and local judge
+eval/fixtures/               Real embeddings, rankings, drafts and judge outputs
+eval/results/                Timestamped raw evidence and provenance
+eval/baseline.json           Dev-derived regression thresholds
+tests/                      Unit/regression suite and six-ticket live demo
+grafana/                    Provisioned dashboard and datasource
+docs/                       Real demo GIF, evidence images and logs
 ```
-db/init.sql                 schema, hybrid search function, KPI view
-kb/                         knowledge base articles (the copilot's only source of truth)
-scripts/ingest_kb.py        chunk + embed + load KB (standard library only)
-scripts/build_workflows.py  generates workflows/*.json (prompts, routing policy and SQL in one place)
-workflows/                  n8n workflow exports
-grafana/                    datasource and dashboard provisioning
-tests/run_demo.py           scenario test: 6 tickets, expected routing
-```
 
-## Known limits and next steps
+## Honest limits
 
-- With only two local models, the judge shares a model family with one of the drafters. A third model family (or the cloud tier) would make arbitration more independent.
-- Agreement between two drafts and a 0.8 confidence threshold are cheap signals, not proof. Confidence is not yet calibrated against a labelled set.
-- SLA targets are simplified to clock hours, so business hours and public holidays are not modelled.
-- Next: email intake (IMAP or Microsoft Graph), Teams alerts for SLA breaches, and evaluation on a larger labelled ticket set.
+This is a synthetic, authored evaluation of a tiny KB, not production ticket
+performance. Labels have no independent human adjudication, and related questions
+are dependent. The dev/test split limits configuration selection but does not
+make this a blinded benchmark. Article-level recall can miss a wrong section;
+the gate checks recall@5 while drafting uses four chunks. Abstention uses ten
+negatives (seven dev), so estimates are coarse. The local judge shares a model
+family with one production drafter and has not been calibrated against humans.
 
-Built by Nazmul Hassan: [LinkedIn](https://www.linkedin.com/in/iamnajib71)
+Security, access changes, P1/P2 and sensitive data always go to a person. Auto
+resolved means a reply was sent, not that an incident was fixed. SLA targets
+are simplified to clock hours. Approval names are self-reported. This is a local
+lab with synthetic data; it needs authentication, audit and operational hardening
+before real use. The office infrastructure is documented in the companion
+[IT Support Homelab](https://github.com/iamnajib71/it-support-homelab).
+
+## Built by Nazmul Hassan
+
+[LinkedIn](https://www.linkedin.com/in/iamnajib71) · [GitHub](https://github.com/iamnajib71)
