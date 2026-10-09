@@ -56,8 +56,13 @@ def main():
     run('docker','compose','restart','n8n')
     for _ in range(60):
         try:
-            with urllib.request.urlopen('http://localhost:5678/healthz',timeout=2) as r:
-                if r.status==200: break
+            with urllib.request.urlopen('http://localhost:5678/healthz/readiness',timeout=2) as r:
+                if r.status==200:
+                    # n8n opens HTTP before it registers published webhook workflows.
+                    probe=subprocess.run(['docker','compose','exec','-T','postgres','psql','-X','-At',
+                        '-U',env['PG_USER'],'-d',env['PG_DB']],cwd=ROOT,text=True,capture_output=True,
+                        input='SELECT count(*) FROM n8n.webhook_entity WHERE "workflowId"=\'itopsIntake00001\' AND method=\'POST\';\n')
+                    if probe.returncode==0 and probe.stdout.strip()=='1': break
         except OSError: pass
         time.sleep(2)
     else: raise RuntimeError('n8n did not become ready')
