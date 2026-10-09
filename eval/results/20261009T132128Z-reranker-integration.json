@@ -1,0 +1,75 @@
+{
+  "provenance": {
+    "utc": "2026-10-09T13:21:28.238002+00:00",
+    "commit": "b1d7fa536f61b491328686689f07e652bfa9e5e6",
+    "dirty": false,
+    "kb_sha256": "2a6b8ae816c7b53f4d6a2cd87d2b63b28d6aa888fc06e43bf74213dfc3a92630",
+    "questions_sha256": "6658736f112f44ae49c68eeea0ccca0493fb8022a08a40c5858bd829b9d4e574",
+    "sql_sha256": "a4e234e22a0356cb9739c373f5a5123f8844dd0cafc2d08f05a086f186e28885",
+    "prompts_sha256": "f9fa45bdb75e9572e89bdd6f9142ea679806b15f991994e3096b6a4c45cd24aa"
+  },
+  "passed": true,
+  "calls": [
+    {
+      "question": "Where do scanner files land?",
+      "response": {
+        "id": "7",
+        "status": "auto_resolved",
+        "priority": "P3",
+        "category": "printing",
+        "summary": "Where do scanned files go?",
+        "confidence": "1.000",
+        "draft_reply": "Scanner files should land in the 'Scanned Documents' folder on the file server. Please check if you have permission to access this folder. If not, ask your manager to approve access.",
+        "citations": [
+          "file-shares#Common problems"
+        ],
+        "judge_verdict": {
+          "reason": "Draft B provides a specific folder name and permission instructions that are directly supported by the evidence.",
+          "winner": "B",
+          "grounded": true,
+          "judge_model": "llama3.1:8b",
+          "draft_models": {
+            "A": "qwen2.5:3b",
+            "B": "llama3.1:8b"
+          },
+          "gate_reasons": [],
+          "rerank_error": null,
+          "retrieval_mode": "reranked",
+          "unsupported_claims": []
+        },
+        "sla_due_at": "2026-10-10T13:20:37.061Z"
+      }
+    },
+    {
+      "question": "Where is the Finance folder?",
+      "response": {
+        "id": "8",
+        "status": "auto_resolved",
+        "priority": "P3",
+        "category": "file_share",
+        "summary": "Finance folder missing",
+        "confidence": "0.950",
+        "draft_reply": "To access the Finance folder, you need to map a network drive. First, connect to the VPN using the WireGuard app. Once connected, open File Explorer, right-click 'This PC', choose 'Map network drive', and enter \\\\fileserver\\finance. Tick 'Reconnect at sign-in' and use your lab username and password. If you're having trouble, check the 'Latest handshake' time in the WireGuard app.",
+        "citations": [
+          "vpn-wireguard#Getting connected",
+          "file-shares#Mapping a drive on Windows"
+        ],
+        "judge_verdict": {
+          "reason": "Draft B is fully grounded, relevant, and would resolve the issue without a technician.",
+          "winner": "B",
+          "grounded": true,
+          "judge_model": "llama3.1:8b",
+          "draft_models": {
+            "A": "qwen2.5:3b",
+            "B": "llama3.1:8b"
+          },
+          "gate_reasons": [],
+          "rerank_error": null,
+          "retrieval_mode": "reranked",
+          "unsupported_claims": []
+        },
+        "sla_due_at": "2026-10-10T13:21:01.790Z"
+      }
+    }
+  ]
+}

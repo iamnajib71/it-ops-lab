@@ -21,3 +21,17 @@ above passed with that fix. Raw replay evidence is retained in
 The real demo GIF is 67.97 seconds, with output recorded by `scripts/record_demo.py`
 in asciinema v2 format and rendered with agg 1.9.0. Its source recording and
 actual elapsed-time metadata are committed alongside the GIF.
+
+## Published GitHub clone
+
+The final check cloned `https://github.com/iamnajib71/it-ops-lab.git` at `b1d7fa5`
+into another temp folder and followed every README quick-start command with fresh
+`it-ops-lab-final` Docker volumes. All six tickets passed, retrieval metrics matched,
+and all eight tests passed (0.31 seconds). Raw replay is retained in
+`eval/results/20261009T131845Z-retrieval.json`.
+
+After that check, two additional fictional webhook tickets exercised
+`RAG_MEASURED=on`, `RAG_VARIANT=reranked`: scanner location and Finance folder.
+Both returned `retrieval_mode=reranked`, proving the real local reranker branch
+ran. Full responses are in `eval/results/20261009T132128Z-reranker-integration.json`.
+This smoke check does not replace the 70-question benchmark or promote the reranker.
