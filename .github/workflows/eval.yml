@@ -1,0 +1,22 @@
+name: Measured RAG regression
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  fast-eval:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python scripts/build_workflows.py
+      - run: git diff --exit-code -- workflows
+      - run: python eval/run_retrieval.py
+      - run: python -m pytest -q
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cached-evaluation-results
+          path: eval/results/

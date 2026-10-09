@@ -1,0 +1,22 @@
+{
+  "duration_s": 71.7346508999999,
+  "playback_factor": 0.7667145418560902,
+  "commands": [
+    [
+      "python",
+      "-u",
+      "tests/run_demo.py"
+    ],
+    [
+      "python",
+      "eval/run_retrieval.py",
+      "--summary"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ]
+  ]
+}

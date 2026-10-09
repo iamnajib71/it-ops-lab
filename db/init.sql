@@ -25,15 +25,15 @@ LANGUAGE sql STABLE AS $$
   WITH tq AS (
     SELECT to_tsquery('english', nullif(array_to_string(tsvector_to_array(to_tsvector('english', q_text)), ' | '), '')) AS q
   ), kw AS (
-    SELECT c.id, row_number() OVER (ORDER BY ts_rank_cd(c.tsv, tq.q) DESC)::INT AS r
+    SELECT c.id, row_number() OVER (ORDER BY ts_rank_cd(c.tsv, tq.q) DESC, c.id)::INT AS r
     FROM kb_chunks c, tq
     WHERE tq.q IS NOT NULL AND c.tsv @@ tq.q
-    ORDER BY ts_rank_cd(c.tsv, tq.q) DESC
+    ORDER BY ts_rank_cd(c.tsv, tq.q) DESC, c.id
     LIMIT 20
   ), vec AS (
-    SELECT c.id, row_number() OVER (ORDER BY c.embedding <=> q_vec)::INT AS r
+    SELECT c.id, row_number() OVER (ORDER BY c.embedding <=> q_vec, c.id)::INT AS r
     FROM kb_chunks c
-    ORDER BY c.embedding <=> q_vec
+    ORDER BY c.embedding <=> q_vec, c.id
     LIMIT 20
   )
   SELECT c.id, c.doc_id, c.title, c.section, c.content,
@@ -43,8 +43,32 @@ LANGUAGE sql STABLE AS $$
   LEFT JOIN kw ON kw.id = c.id
   LEFT JOIN vec ON vec.id = c.id
   WHERE kw.id IS NOT NULL OR vec.id IS NOT NULL
-  ORDER BY rrf DESC
+  ORDER BY rrf DESC, c.id
   LIMIT k;
+$$;
+
+-- Measured variants; the original hybrid function remains available unchanged.
+CREATE OR REPLACE FUNCTION kb_retrieve(q_text TEXT, q_vec vector(768), k INT DEFAULT 4, mode TEXT DEFAULT 'hybrid')
+RETURNS TABLE(id BIGINT, doc_id TEXT, title TEXT, section TEXT, content TEXT, rrf DOUBLE PRECISION, kw_rank INT, vec_rank INT)
+LANGUAGE plpgsql STABLE AS $$
+BEGIN
+  IF mode = 'keyword' THEN
+    RETURN QUERY
+      WITH tq AS (SELECT to_tsquery('english',nullif(array_to_string(tsvector_to_array(to_tsvector('english',q_text)), ' | '),'')) q)
+      SELECT c.id,c.doc_id,c.title,c.section,c.content,ts_rank_cd(c.tsv,tq.q)::double precision,
+        row_number() OVER (ORDER BY ts_rank_cd(c.tsv,tq.q) DESC,c.id)::int,NULL::int
+      FROM kb_chunks c,tq WHERE tq.q IS NOT NULL AND c.tsv @@ tq.q
+      ORDER BY ts_rank_cd(c.tsv,tq.q) DESC,c.id LIMIT k;
+  ELSIF mode = 'vector' THEN
+    RETURN QUERY SELECT c.id,c.doc_id,c.title,c.section,c.content,(1-(c.embedding <=> q_vec))::double precision,
+      NULL::int,row_number() OVER (ORDER BY c.embedding <=> q_vec,c.id)::int
+      FROM kb_chunks c ORDER BY c.embedding <=> q_vec,c.id LIMIT k;
+  ELSIF mode IN ('hybrid','reranked') THEN
+    RETURN QUERY SELECT * FROM kb_hybrid_search(q_text,q_vec,k);
+  ELSE
+    RAISE EXCEPTION 'Unknown retrieval mode: %',mode;
+  END IF;
+END;
 $$;
 
 CREATE TABLE IF NOT EXISTS tickets (

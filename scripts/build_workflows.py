@@ -78,7 +78,7 @@ const ROUTES = {
   classify: ['qwen2.5:3b', 'llama3.1:8b'],
   draft_a:  ['qwen2.5:3b', 'llama3.1:8b'],
   draft_b:  ['llama3.1:8b', 'qwen2.5:3b'],
-  judge:    ['glm-5.3:cloud', 'llama3.1:8b', 'qwen2.5:3b'],
+  judge:    ['llama3.1:8b', 'qwen2.5:3b'],
   digest:   ['qwen2.5:3b', 'llama3.1:8b'],
 };
 const DAILY_CLOUD_BUDGET_USD = 0.50;   // cost autopilot: cloud tier switches off once spent
@@ -237,14 +237,40 @@ return [{ json: { q, vec: JSON.stringify(res.embeddings[0]), triage: $input.firs
 """
 
 # n8n splits multiple query parameters on commas, so every multi-value query takes one JSON parameter.
-SEARCH_SQL = "SELECT doc_id, coalesce(section,'') AS section, content, rrf, kw_rank, vec_rank FROM kb_hybrid_search($1::jsonb->>'q', ($1::jsonb->>'vec')::vector, 4)"
+SEARCH_SQL = "SELECT id, doc_id, coalesce(section,'') AS section, content, rrf, kw_rank, vec_rank FROM kb_retrieve($1::jsonb->>'q', ($1::jsonb->>'vec')::vector, CASE WHEN $1::jsonb->>'mode' = 'reranked' THEN 20 ELSE 4 END, $1::jsonb->>'mode')"
+RETRIEVE_JS = RETRIEVE_JS.replace('q, vec:', "q, mode: $env.RAG_MEASURED === 'on' ? ($env.RAG_VARIANT || 'keyword') : 'hybrid', vec:")
+RERANK_JS = r"""
+const candidates = $input.all().map(i => i.json).filter(c => c.doc_id);
+const mode = $('Retrieve KB').first().json.mode;
+if (!candidates.length) return [{json: {retrieval_mode: mode}}];
+if (mode !== 'reranked') return candidates.map(json => ({json: {...json, retrieval_mode: mode}}));
+const query = $('Retrieve KB').first().json.q;
+const system = __RERANK_PROMPT__;
+try {
+  const response = await this.helpers.httpRequest({method: 'POST',
+    url: `${$env.OLLAMA_URL || 'http://host.docker.internal:11434'}/api/chat`, json: true, timeout: 300000,
+    body: {model: 'qwen2.5:3b', stream: false, format: {type:'object',
+      properties:{ranking:{type:'array',items:{type:'integer',enum:candidates.map(c=>Number(c.id))},
+        minItems:candidates.length,maxItems:candidates.length}},required:['ranking'],additionalProperties:false},
+      options: {temperature: 0, seed: 42, num_predict: 600, num_ctx: 8192},
+      messages: [{role: 'system', content: system}, {role: 'user', content: JSON.stringify({question: query,
+        sections: candidates.map(c => ({id: Number(c.id), doc_id: c.doc_id, section: c.section, content: c.content}))})}]}});
+  const order = JSON.parse(response.message.content).ranking;
+  if (!Array.isArray(order) || order.length !== candidates.length || new Set(order).size !== candidates.length ||
+      order.some(i => !Number.isInteger(i) || !candidates.some(c => Number(c.id) === i))) throw new Error('invalid ranking');
+  return order.slice(0,4).map(i => ({json: {...candidates.find(c => Number(c.id) === i), retrieval_mode: 'reranked'}}));
+} catch (e) {
+  // Retain service availability, and surface the fallback instead of pretending reranking succeeded.
+  return candidates.slice(0,4).map(json => ({json: {...json, retrieval_mode: 'hybrid-fallback', rerank_error: String(e.message).slice(0,200)}}));
+}
+""".replace('__RERANK_PROMPT__', json.dumps((ROOT / 'eval/prompts/reranker.txt').read_text(encoding='utf-8')))
 
 DRAFT_REQ_JS = r"""
 // Build the same grounded prompt for two different models (A and B) so a judge can arbitrate.
 const t = $('Normalise and PII check').first().json;
 const ticket_id = $('Insert ticket').first().json.id;
 const triage = $('Retrieve KB').first().json.triage;
-const kb = $input.all().map(i => i.json);
+const kb = $input.all().map(i => i.json).filter(c => c.doc_id);
 const context = kb.map(k => `[${k.doc_id}#${k.section}]\n${k.content}`).join('\n\n');
 const system = `You are an IT service desk analyst replying to a staff member.
 Use ONLY the knowledge base excerpts provided, and only the steps that apply to this person's exact problem
@@ -261,7 +287,7 @@ JUDGE_REQ_JS = r"""
 const drafts = $input.all().map(i => i.json);
 const a = drafts.find(d => d.task === 'draft_a') || drafts[0];
 const b = drafts.find(d => d.task === 'draft_b') || drafts[1] || drafts[0];
-const kb = $('Hybrid search').all().map(i => i.json);
+const kb = $('Rerank KB').all().map(i => i.json).filter(c => c.doc_id);
 const t = $('Normalise and PII check').first().json;
 const context = kb.map(k => `[${k.doc_id}#${k.section}]\n${k.content}`).join('\n\n');
 const show = d => d && d.ok ? (d.parsed?.reply || d.content) : '(no draft: model failed)';
@@ -286,7 +312,7 @@ const triage = $('Retrieve KB').first().json.triage.parsed || {};
 const judgeRun = $input.first().json;
 const j = judgeRun.parsed || {};
 const drafts = $('Build judge request').first().json.drafts;
-const kb = $('Hybrid search').all().map(i => `${i.json.doc_id}#${i.json.section}`);
+const kb = $('Rerank KB').all().filter(i => i.json.doc_id).map(i => `${i.json.doc_id}#${i.json.section}`);
 const pick = j.winner === 'B' && drafts.B.ok ? drafts.B : (drafts.A.ok ? drafts.A : drafts.B);
 // Small models often under-escape Windows paths in JSON ("\f" becomes a form feed): restore UNC paths.
 const cleanReply = s => (s || '').replace(/\f/g, '\\f').replace(/(^|[^\\])\\(fileserver)/g, '$1\\\\$2');
@@ -323,7 +349,8 @@ return [{ json: {
   draft_reply: cleanReply(pick.reply) || null, citations: cites, confidence,
   judge_verdict: { winner: j.winner, grounded: !!j.grounded, unsupported_claims: j.unsupported_claims || [],
                    reason: j.reason || null, judge_model: judgeRun.model, draft_models: { A: drafts.A.model, B: drafts.B.model },
-                   gate_reasons: reasons },
+                   gate_reasons: reasons, retrieval_mode: $('Rerank KB').first().json.retrieval_mode,
+                   rerank_error: $('Rerank KB').first().json.rerank_error || null },
   sla_hours: hours,
 } }];
 """
@@ -348,7 +375,8 @@ intake = workflow("itopsIntake00001", "Ticket intake (triage, hybrid RAG, arbitr
     code("Build classify request", CLASSIFY_REQ_JS, [600, 0]),
     call_gateway("Gateway: classify", [800, 0]),
     code("Retrieve KB", RETRIEVE_JS, [1000, 0]),
-    sql("Hybrid search", SEARCH_SQL, [1200, 0], "={{ JSON.stringify({ q: $json.q, vec: $json.vec }) }}"),
+    sql("Hybrid search", SEARCH_SQL, [1200, 0], "={{ JSON.stringify({ q: $json.q, vec: $json.vec, mode: $json.mode }) }}", alwaysOutputData=True),
+    code("Rerank KB", RERANK_JS, [1300, 0]),
     code("Build draft requests", DRAFT_REQ_JS, [1400, 0]),
     node("Gateway: drafts A and B", "n8n-nodes-base.executeWorkflow", 1.2, {
         "workflowId": {"__rl": True, "value": GATEWAY_ID, "mode": "id"},
@@ -359,7 +387,7 @@ intake = workflow("itopsIntake00001", "Ticket intake (triage, hybrid RAG, arbitr
     sql("Update ticket", UPDATE_TICKET_SQL, [2400, 0], "={{ JSON.stringify($json) }}"),
     node("Respond", "n8n-nodes-base.respondToWebhook", 1.1, {"respondWith": "firstIncomingItem", "options": {}}, [2600, 0]),
 ], chain("New ticket", "Normalise and PII check", "Insert ticket", "Build classify request", "Gateway: classify",
-         "Retrieve KB", "Hybrid search", "Build draft requests", "Gateway: drafts A and B", "Build judge request",
+         "Retrieve KB", "Hybrid search", "Rerank KB", "Build draft requests", "Gateway: drafts A and B", "Build judge request",
          "Gateway: judge", "Policy gate", "Update ticket", "Respond"), tags=["it-ops-lab"])
 
 

@@ -1,0 +1,2330 @@
+{
+  "provenance": {
+    "utc": "2026-10-09T12:59:04.770085+00:00",
+    "commit": "42188662be714b1340522fd3705a5fcd254dd37d",
+    "dirty": true,
+    "kb_sha256": "2a6b8ae816c7b53f4d6a2cd87d2b63b28d6aa888fc06e43bf74213dfc3a92630",
+    "questions_sha256": "6658736f112f44ae49c68eeea0ccca0493fb8022a08a40c5858bd829b9d4e574",
+    "sql_sha256": "a4e234e22a0356cb9739c373f5a5123f8844dd0cafc2d08f05a086f186e28885",
+    "prompts_sha256": "f9fa45bdb75e9572e89bdd6f9142ea679806b15f991994e3096b6a4c45cd24aa"
+  },
+  "mode": "live",
+  "variant": "keyword",
+  "metric_protocol": "v2: article membership separate from exact tags; explicit refusal separate from citation-free refusal",
+  "models": {
+    "answer": "qwen2.5:3b",
+    "judge": "llama3.1:8b"
+  },
+  "runtime": {
+    "ollama": {
+      "version": "0.33.2"
+    },
+    "models": [
+      {
+        "name": "qwen2.5:3b",
+        "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "size": 1929912432
+      },
+      {
+        "name": "nomic-embed-text:latest",
+        "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+        "size": 274302450
+      },
+      {
+        "name": "llama3.1:8b",
+        "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+        "size": 4920753328
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q001",
+      "split": "dev",
+      "gold": [
+        "vpn-wireguard"
+      ],
+      "context": {
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\").",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first."
+      },
+      "answer": {
+        "reply": "All staff who work from home or travel can use the remote access tunnel. Contractors need manager approval first and should raise a ticket with category 'Access'.",
+        "citations": [
+          "vpn-wireguard#Who can use it"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the evidence, including the specific instructions for contractors to raise a ticket with category 'Access'."
+      }
+    },
+    {
+      "id": "q002",
+      "split": "dev",
+      "gold": [
+        "vpn-wireguard"
+      ],
+      "context": {
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC."
+      },
+      "answer": {
+        "reply": "Given the issue with the WireGard connection, check the 'Latest handshake' time. If it never updates, try using a phone hotspot as the hotel or guest Wi-Fi might block UDP 51820. If the handshake works but shares do not open, ask IT to revoke the old configuration and issue a new one.",
+        "citations": [
+          "vpn-wireguard#Troubleshooting: - Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old config and issue a new one."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions from the evidence, including checking the 'Latest handshake' time and trying a phone hotspot if it never updates. It also correctly suggests asking IT to revoke the old configuration and issue a new one if the handshake works but shares do not open."
+      }
+    },
+    {
+      "id": "q003",
+      "split": "test",
+      "gold": [
+        "vpn-wireguard"
+      ],
+      "context": {
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |"
+      },
+      "answer": {
+        "reply": "Based on the provided KB, you should ask IT to revoke the old configuration and issue a new one since the handshake works but shares fail after rebuilding your laptop. Check if the latest handshake time is updating and consider using a phone hotspot if it\u2019s not. Additionally, ensure that the IT team has issued the correct access for your new configuration by reviewing the available shares in the file-shares section.",
+        "citations": [
+          "vpn-wireguard#Troubleshooting#- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old config and issue a new one."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions from the provided KB, specifically citing the relevant section for the issue described in the question. It also provides additional helpful information, but the core instruction is supported by the evidence."
+      }
+    },
+    {
+      "id": "q004",
+      "split": "dev",
+      "gold": [
+        "vpn-wireguard"
+      ],
+      "context": {
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket."
+      },
+      "answer": {
+        "reply": "You cannot give your colleague your VPN QR code as each config is tied to one device. Instead, follow the onboarding process for your colleague to receive their own VPN access. Ask your manager to raise an Onboarding ticket for your colleague at least 3 business days before their start date, and IT will handle the rest including issuing the VPN access for roles that work remotely.",
+        "citations": [
+          "vpn-wireguard#Getting connected",
+          "onboarding-offboarding#New starter checklist (IT)"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer correctly states that the VPN config is tied to one device and cannot be shared. It also provides a correct procedure for the colleague to receive their own VPN access through the onboarding process."
+      }
+    },
+    {
+      "id": "q005",
+      "split": "dev",
+      "gold": [
+        "vpn-wireguard"
+      ],
+      "context": {
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\").",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket."
+      },
+      "answer": {
+        "reply": "To import the remote access configuration, follow these steps: 1. Install the WireGuard app on your device. 2. IT sends you a personal config file or a QR code from the VPN admin console. 3. Import the file (or scan the QR code) and toggle the tunnel on. 4. Test by opening the file share or the printer page.",
+        "citations": [
+          "vpn-wireguard#Getting connected: 1.",
+          "vpn-wireguard#Getting connected: 2.",
+          "vpn-wireguard#Getting connected: 3.",
+          "vpn-wireguard#Getting connected: 4."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions from the evidence, specifically from vpn-wireguard#Getting connected. Each step is supported by a citation, and the instructions are applicable to this question."
+      }
+    },
+    {
+      "id": "q006",
+      "split": "test",
+      "gold": [
+        "vpn-wireguard"
+      ],
+      "context": {
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "To troubleshoot a slow VPN, disconnect from other VPNs as per [doc_id#vpn-wireguard#Troubleshooting].",
+        "citations": [
+          "doc_id#vpn-wireguard#Troubleshooting"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": true,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer correctly cites the relevant document and provides the correct instruction to troubleshoot a slow VPN."
+      }
+    },
+    {
+      "id": "q007",
+      "split": "dev",
+      "gold": [
+        "vpn-wireguard"
+      ],
+      "context": {
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\")."
+      },
+      "answer": {
+        "reply": "To revoke your stolen laptop's WireGuard profile, raise a P1 ticket with IT immediately. They will revoke the device's peer key as per the onboarding-offboarding#New starter checklist (IT) instructions.",
+        "citations": [
+          "vpn-wireguard#Troubleshooting: - Lost or stolen device"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions in the evidence for revoking a lost or stolen device's peer key, and cites the relevant section of the evidence."
+      }
+    },
+    {
+      "id": "q008",
+      "split": "dev",
+      "gold": [
+        "file-shares"
+      ],
+      "context": {
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder."
+      },
+      "answer": {
+        "reply": "The Finance folder is located at \\\\fileserver\\Finance. Access is restricted to the Finance team only.",
+        "citations": [
+          "file-shares#Available shares#Finance"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately states the location of the Finance folder and its access restrictions, and the evidence supports these claims."
+      }
+    },
+    {
+      "id": "q009",
+      "split": "test",
+      "gold": [
+        "file-shares"
+      ],
+      "context": {
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports."
+      },
+      "answer": {
+        "reply": "Map a drive to the folder by following these steps: Open File Explorer, right-click \"This PC\", choose \"Map network drive\", pick a letter (e.g. P:), enter \\\\fileserver\\Public, tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password. If you are off-site, connect the VPN first.",
+        "citations": [
+          "file-shares#Mapping a drive on Windows"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions in the provided evidence, including the use of lab credentials and reconnecting at sign-in. It also correctly advises connecting the VPN first when working remotely."
+      }
+    },
+    {
+      "id": "q010",
+      "split": "dev",
+      "gold": [
+        "file-shares"
+      ],
+      "context": {
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\").",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |"
+      },
+      "answer": {
+        "reply": "For Finance access issues, follow the steps in file-shares#Common problems: \"Access is denied\" on Finance. Ask your manager to approve, then raise an Access ticket. Check if you are off-site without the VPN or if the server name did not resolve. If so, try the IP address from the IT intranet. If you are still facing issues, contact IT for further assistance.",
+        "citations": [
+          "file-shares#Common problems: \"Access is denied\" on Finance. Ask your manager to approve, then raise an Access ticket.\r\nfile-shares#Common problems: \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\nfile-shares#Common problems: Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\nfile-shares#Common problems: Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions in the evidence for 'Access is denied' on Finance, and does not invent any additional steps. It also correctly references the relevant section of the evidence."
+      }
+    },
+    {
+      "id": "q011",
+      "split": "dev",
+      "gold": [
+        "file-shares"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "doc_id#file-shares#Common problems"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up, so it is abstained. However, the evidence does not support the claim that the file is recoverable, as the relevant section only mentions shadow copies for recovering the wrong version of a file, not for recovering overwritten files."
+      }
+    },
+    {
+      "id": "q012",
+      "split": "test",
+      "gold": [
+        "file-shares"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first."
+      },
+      "answer": {
+        "reply": "Scanners files land in the \\\\fileserver\\Scans share. [doc_id#file-shares#Available shares].",
+        "citations": [
+          "doc_id#file-shares#Available shares"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": true,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately states that scanner files land in the \\\\fileserver\\Scans share, which is supported by the evidence in the file-shares#Available shares section."
+      }
+    },
+    {
+      "id": "q013",
+      "split": "dev",
+      "gold": [
+        "file-shares"
+      ],
+      "context": {
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "password-mfa#Resetting a forgotten password",
+          "password-mfa#Account locked out",
+          "password-mfa#Suspicious email asking for your password",
+          "email-outlook#"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up, so it is abstained. However, it does not provide any instructions, so it is not faithful."
+      }
+    },
+    {
+      "id": "q014",
+      "split": "dev",
+      "gold": [
+        "file-shares"
+      ],
+      "context": {
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |"
+      },
+      "answer": {
+        "reply": "For the issue of 'Network path not found', try the IP address from the IT intranet as a potential solution. If off-site, ensure your date and time are correct and restart your Wi-Fi. If still not resolved, contact IT for further assistance.",
+        "citations": [
+          "wifi-network#Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.",
+          "file-shares#Common problems: \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer correctly identifies the issue as either being off-site without VPN or server name resolution failure, and provides the correct solution of trying the IP address from the IT intranet. It also mentions checking date and time and restarting Wi-Fi, which are also mentioned in the evidence as potential solutions for connectivity issues."
+      }
+    },
+    {
+      "id": "q015",
+      "split": "test",
+      "gold": [
+        "printing"
+      ],
+      "context": {
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first."
+      },
+      "answer": {
+        "reply": "To add the Office-Laser printer on Windows, follow these steps: Open Settings > Bluetooth & devices > Printers & scanners > Add device. If the printer is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser. For macOS, go to System Settings > Printers & Scanners, choose the IP tab, protocol IPP, address printserver, and queue printers/Office-Laser.",
+        "citations": [
+          "printing#Adding the office printer"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": ""
+      }
+    },
+    {
+      "id": "q016",
+      "split": "dev",
+      "gold": [
+        "printing"
+      ],
+      "context": {
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket."
+      },
+      "answer": {
+        "reply": "For macOS, add the office printer by going to System Settings > Printers & Scanners > Add, choose the IP tab, enter the address printserver, and select the queue printers/Office-Laser.",
+        "citations": [
+          "printing#Adding the office printer: macOS"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": ""
+      }
+    },
+    {
+      "id": "q017",
+      "split": "dev",
+      "gold": [
+        "printing"
+      ],
+      "context": {
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "service-desk-policy#Automation and AI assistance": "The AI copilot drafts answers from this knowledge base only. Replies are sent automatically only for low-risk P3/P4 questions where the copilot is confident and an independent check agrees the answer is fully supported by the knowledge base. Security incidents, access changes, P1/P2 issues, and any ticket containing personal or sensitive information always go to a human.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports."
+      },
+      "answer": {
+        "reply": "For a printer that is offline, check that the printer has power and paper, and the screen shows no error. Restart the printer if necessary. If the issue persists, verify the print server is functioning correctly and consider raising a P2 ticket if multiple users are affected.",
+        "citations": [
+          "printing#Troubleshooting"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer is fully supported by the evidence in printing#Troubleshooting. The instructions are identical to the reference answer, and the additional suggestion to verify the print server is functioning correctly is also supported by the evidence."
+      }
+    },
+    {
+      "id": "q018",
+      "split": "test",
+      "gold": [
+        "printing"
+      ],
+      "context": {
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share."
+      },
+      "answer": {
+        "reply": "To resolve a job stuck in the print queue, open http://printserver:631/jobs and cancel your job. Then, print again. For printer issues, ensure it has power and paper, and check for errors on the screen. If it\u2019s offline, restart it. For blank or garbled prints, remove and re-add the printer using a generic PCL or IPP Everywhere driver. If multiple users are having trouble, raise a P2 ticket. For home users, connect to the VPN first. For adding the office printer, use the provided methods for Windows, macOS, and a PDF printer.",
+        "citations": [
+          "printing#Troubleshooting",
+          "printing#Adding the office printer"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions and factual claims from the provided evidence, including the troubleshooting steps and printer setup methods. The citations are also correct, referencing the relevant sections in the evidence."
+      }
+    },
+    {
+      "id": "q019",
+      "split": "dev",
+      "gold": [
+        "printing"
+      ],
+      "context": {
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631."
+      },
+      "answer": {
+        "reply": "The issue with blank or gibberish pages is best addressed under the 'printing#Troubleshooting' section. Follow the steps to remove and re-add the printer to refresh the driver.",
+        "citations": [
+          "printing#Troubleshooting"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately cites the relevant section of the evidence and provides the correct instructions for the issue at hand."
+      }
+    },
+    {
+      "id": "q020",
+      "split": "dev",
+      "gold": [
+        "printing"
+      ],
+      "context": {
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\").",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first."
+      },
+      "answer": {
+        "reply": "To print while working from home, connect to the VPN first. If multiple people are having issues, raise a P2 ticket. For Windows, add the printer using the IP address http://printserver:631/printers/Office-Laser. For macOS, use IPP Everywhere. If you need to save print jobs as PDFs, use the Office-PDF queue. For file access, map a network drive using \\\\fileserver\\Public with your lab credentials and reconnect at sign-in.",
+        "citations": [
+          "printing#Troubleshooting",
+          "printing#Adding the office printer",
+          "vpn-wireguard#Who can use it",
+          "file-shares#Mapping a drive on Windows"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "All instructions and factual claims are supported by the evidence and apply to this question."
+      }
+    },
+    {
+      "id": "q021",
+      "split": "test",
+      "gold": [
+        "printing"
+      ],
+      "context": {
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |"
+      },
+      "answer": {
+        "reply": "Based on the provided KB, the issue could be related to the print server. Check if the print server is accessible and functioning. If it is, try adding the printer again using the provided methods for Windows and macOS. If the problem persists, raise a P2 ticket as it might be a server issue. For network connectivity, ensure the staff network is active and check if the Wi-Fi is functioning correctly. If the issue is with file shares, verify if the printer is added to the correct share path.",
+        "citations": [
+          "printing#Troubleshooting",
+          "printing#Adding the office printer",
+          "wifi-network#",
+          "file-shares#Available shares"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately applies the instructions from the provided KB to the question. It correctly identifies the print server as a potential cause of the issue and provides relevant troubleshooting steps. The answer also mentions checking the network connectivity and file shares, which is consistent with the KB. The only potential issue is that the answer does not explicitly state that the KB does not cover the question, but since the answer is based on the KB, it is likely that the technician will follow up with further investigation if necessary."
+      }
+    },
+    {
+      "id": "q022",
+      "split": "dev",
+      "gold": [
+        "password-mfa"
+      ],
+      "context": {
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket.",
+        "password-mfa#New phone or lost authenticator": "Raise an Access ticket. IT will verify your identity on a video call before resetting MFA. A lost phone is a security issue; mention it so IT can sign out other sessions."
+      },
+      "answer": {
+        "reply": "Go to the self-service reset portal and click \"Forgot password\" to start the password reset process. Verify your account using your registered authenticator app or mobile number. Choose a new passphrase of at least 14 characters. IT staff will not ask for your password via email, chat, or phone.",
+        "citations": [
+          "password-mfa#Resetting a forgotten password"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": ""
+      }
+    },
+    {
+      "id": "q023",
+      "split": "dev",
+      "gold": [
+        "password-mfa"
+      ],
+      "context": {
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "password-mfa#New phone or lost authenticator": "Raise an Access ticket. IT will verify your identity on a video call before resetting MFA. A lost phone is a security issue; mention it so IT can sign out other sessions.",
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "service-desk-policy#Priorities and response targets",
+          "vpn-wireguard#Troubleshooting",
+          "password-mfa#New phone or lost authenticator",
+          "onboarding-offboarding#New starter checklist (IT)"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up, so it is abstained. However, it does not provide any instructions or factual claims to evaluate against the evidence."
+      }
+    },
+    {
+      "id": "q024",
+      "split": "test",
+      "gold": [
+        "password-mfa"
+      ],
+      "context": {
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |"
+      },
+      "answer": {
+        "reply": "Accounts lock for 15 minutes after 5 failed attempts. Given the priority level of a single user issue with a workaround (P3), the resolution target is 3 business days. Considering the lockout duration, you should wait at least 15 minutes after 5 failed attempts, then wait an additional 12 hours (3 business days - 15 minutes) for the account to unlock. This totals 12 hours and 5 minutes. However, the exact time may vary based on the system's processing time and other factors.",
+        "citations": [
+          "password-mfa#Account locked out"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": false,
+        "reason": "The answer incorrectly adds 12 hours to the 15 minute lockout period, and also mentions system processing time and other factors, which is not supported by the evidence."
+      }
+    },
+    {
+      "id": "q025",
+      "split": "dev",
+      "gold": [
+        "password-mfa"
+      ],
+      "context": {
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB."
+      },
+      "answer": {
+        "reply": "Refer to the 'Account locked out' section for guidance on handling frequent password lockouts. Update the password in mail apps and ensure no old passwords are being reused. If the issue persists, consider resetting the password through the self-service reset portal as described in the 'Resetting a forgotten password' section.",
+        "citations": [
+          "password-mfa#Account locked out",
+          "password-mfa#Resetting a forgotten password"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately cites the relevant sections of the evidence and provides clear instructions for the user to follow. The instructions are supported by the evidence and apply to the question."
+      }
+    },
+    {
+      "id": "q026",
+      "split": "dev",
+      "gold": [
+        "password-mfa"
+      ],
+      "context": {
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#New phone or lost authenticator": "Raise an Access ticket. IT will verify your identity on a video call before resetting MFA. A lost phone is a security issue; mention it so IT can sign out other sessions.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "password-mfa#Resetting a forgotten password",
+          "password-mfa#New phone or lost authenticator",
+          "email-outlook#",
+          "onboarding-offboarding#New starter checklist (IT)"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up, so it is abstained. However, it does not provide a correct instruction for resetting MFA, which is the main question."
+      }
+    },
+    {
+      "id": "q027",
+      "split": "test",
+      "gold": [
+        "password-mfa"
+      ],
+      "context": {
+        "password-mfa#New phone or lost authenticator": "Raise an Access ticket. IT will verify your identity on a video call before resetting MFA. A lost phone is a security issue; mention it so IT can sign out other sessions.",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "Raise an Access ticket to reset MFA. IT will verify your identity on a video call before resetting MFA. Mention that your phone with the authenticator is lost to ensure proper handling of your security issue.",
+        "citations": [
+          "password-mfa#New phone or lost authenticator"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": ""
+      }
+    },
+    {
+      "id": "q028",
+      "split": "dev",
+      "gold": [
+        "password-mfa"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket."
+      },
+      "answer": {
+        "reply": "According to the provided KB, if you typed your password into a fake mailbox warning link, you should not have clicked on any links or entered your password. Instead, use the 'Report phishing' option in Outlook or forward the email to IT. Then, immediately change your password and raise a P1 Security ticket. Clear saved credentials in Windows Credential Manager as a precautionary measure.",
+        "citations": [
+          "password-mfa#Suspicious email asking for your password"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions in the provided evidence, including using 'Report phishing' in Outlook or forwarding the email to IT, changing the password, and raising a P1 Security ticket. Additionally, it includes the precautionary measure of clearing saved credentials in Windows Credential Manager, which is also mentioned in the evidence."
+      }
+    },
+    {
+      "id": "q029",
+      "split": "dev",
+      "gold": [
+        "wifi-network"
+      ],
+      "context": {
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\").",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports."
+      },
+      "answer": {
+        "reply": "The staff use the SSID 'Office-Staff' for their network.",
+        "citations": [
+          "wifi-network#"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer is supported by the evidence in 'wifi-network#' which explicitly states that staff use the SSID 'Office-Staff' for their network."
+      }
+    },
+    {
+      "id": "q030",
+      "split": "test",
+      "gold": [
+        "wifi-network"
+      ],
+      "context": {
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket."
+      },
+      "answer": {
+        "reply": "The guest wireless password for the Office-Guest network changes monthly and is displayed at the reception. Check the date and time on your device if you are unable to connect, or move closer to the access point if the internet is slow.",
+        "citations": [
+          "wifi-network#"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the evidence, including the location of the guest wireless password and troubleshooting steps."
+      }
+    },
+    {
+      "id": "q031",
+      "split": "dev",
+      "gold": [
+        "wifi-network"
+      ],
+      "context": {
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB."
+      },
+      "answer": {
+        "reply": "Visitors on the Office-Guest network can reach printers by adding the Office-Laser printer through their respective operating systems (Windows, macOS) as per the instructions provided in the KB. However, they cannot access file shares and are restricted from using file servers.",
+        "citations": [
+          "wifi-network#Adding the office printer",
+          "printing#Troubleshooting"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately states that visitors on the Office-Guest network can reach printers by adding the Office-Laser printer through their respective operating systems, and provides instructions for doing so. The citations provided are relevant to the instructions given in the answer."
+      }
+    },
+    {
+      "id": "q032",
+      "split": "dev",
+      "gold": [
+        "wifi-network"
+      ],
+      "context": {
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket."
+      },
+      "answer": {
+        "reply": "For your Wi-Fi connection issue, try forgetting the network, checking the date and time on your laptop, and restarting your Wi-Fi. If the problem persists, refer to the 'Cannot connect' section in the WiFi-network KB for further troubleshooting steps.",
+        "citations": [
+          "wifi-network#"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions in the 'wifi-network#' section of the evidence, including forgetting the network, checking the date and time, and restarting Wi-Fi. It also refers to the 'Cannot connect' section for further steps, which is consistent with the evidence."
+      }
+    },
+    {
+      "id": "q033",
+      "split": "test",
+      "gold": [
+        "wifi-network"
+      ],
+      "context": {
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "For slow Internet, raise a P2 ticket as per the KB. For personal devices, try moving closer to the access point and closing large uploads or syncs.",
+        "citations": [
+          "wifi-network#section"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the KB's instructions for slow Internet (raise a P2 ticket) and provides additional advice for personal devices that is consistent with the KB's troubleshooting steps."
+      }
+    },
+    {
+      "id": "q034",
+      "split": "dev",
+      "gold": [
+        "wifi-network"
+      ],
+      "context": {
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631."
+      },
+      "answer": {
+        "reply": "Check if your slow wireless connection is due to the Guest network, as it may be causing issues for everyone. Ensure you are connected to the correct network and that your device\u2019s date and time are correct. If the problem persists, try restarting your Wi-Fi. If you are still experiencing issues, consider raising a P2 ticket to investigate further.",
+        "citations": [
+          "wifi-network#Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer correctly cites the relevant section of the evidence and provides instructions that are supported by the evidence. The answer also does not invent any instructions and does not say the KB does not cover the question."
+      }
+    },
+    {
+      "id": "q035",
+      "split": "dev",
+      "gold": [
+        "wifi-network"
+      ],
+      "context": {
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder."
+      },
+      "answer": {
+        "reply": "You may not connect a personal router to a wall port as stated in the policy provided in the KB. Staff network access is restricted to WPA2-Enterprise authentication, and personal devices are not allowed to bypass these security measures.",
+        "citations": [
+          "wifi-network#Cannot connect"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the policy stated in the KB, specifically the section on wifi-network#Cannot connect, which explicitly prohibits connecting personal routers to office wall ports."
+      }
+    },
+    {
+      "id": "q036",
+      "split": "test",
+      "gold": [
+        "email-outlook"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket.",
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps."
+      },
+      "answer": {
+        "reply": "For repeatedly asked Outlook password issues, refer to the self-service reset portal by clicking 'Forgot password' and follow the steps provided. Ensure to use a passphrase of at least 14 characters and avoid reusing old passwords. If you receive a suspicious email asking for your password, do not click and use the 'Report phishing' option in Outlook or forward it to IT.",
+        "citations": [
+          "password-mfa#Resetting a forgotten password",
+          "password-mfa#Suspicious email asking for your password"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions from the evidence for resetting a forgotten password and handling suspicious emails asking for a password. However, it does not address the specific issue of Outlook repeatedly asking for a password, which is the main question. The answer does not invent instructions, but it does not explicitly state that the KB does not cover the question, so it is not abstained."
+      }
+    },
+    {
+      "id": "q037",
+      "split": "dev",
+      "gold": [
+        "email-outlook"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder."
+      },
+      "answer": {
+        "reply": "To clear space in your mailbox, archive old mail with Online Archive, empty Deleted Items, and remove large attachments.",
+        "citations": [
+          "email-outlook#- Mailbox full:"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions from the evidence for clearing a mailbox full issue."
+      }
+    },
+    {
+      "id": "q038",
+      "split": "dev",
+      "gold": [
+        "email-outlook"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports."
+      },
+      "answer": {
+        "reply": "Restarting Outlook may resolve the shared mailbox visibility issue. For other issues, refer to the provided KB sections for specific solutions.",
+        "citations": [
+          "email-outlook#3",
+          "file-shares#Common problems1",
+          "wifi-network#4"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately references the KB sections for specific solutions, but also provides a general solution for the shared mailbox visibility issue, which is supported by the evidence."
+      }
+    },
+    {
+      "id": "q039",
+      "split": "test",
+      "gold": [
+        "email-outlook"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "password-mfa#New phone or lost authenticator": "Raise an Access ticket. IT will verify your identity on a video call before resetting MFA. A lost phone is a security issue; mention it so IT can sign out other sessions.",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps."
+      },
+      "answer": {
+        "reply": "For a phone calendar not syncing, remove and re-add the account in the Outlook mobile app as per [doc_id#email-outlook#].",
+        "citations": [
+          "doc_id#email-outlook#"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": true,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer directly references the provided evidence and follows the instructions given in the evidence for the specific issue of a phone calendar not syncing."
+      }
+    },
+    {
+      "id": "q040",
+      "split": "dev",
+      "gold": [
+        "email-outlook"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "email-outlook#",
+          "password-mfa#Resetting a forgotten password",
+          "password-mfa#Suspicious email asking for your password"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up, so it is abstained. However, it does not address the question about emailing a 35 MB attachment, which is the main reason for the evaluation."
+      }
+    },
+    {
+      "id": "q041",
+      "split": "dev",
+      "gold": [
+        "email-outlook"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#New phone or lost authenticator": "Raise an Access ticket. IT will verify your identity on a video call before resetting MFA. A lost phone is a security issue; mention it so IT can sign out other sessions."
+      },
+      "answer": {
+        "reply": "Based on the provided KB, for Outlook showing the sign-in box after signing in, you should clear saved credentials in Windows Credential Manager and then sign in again if Multi-Factor Authentication (MFA) is expected. If the issue persists, check if your mailbox is full, shared mailboxes are syncing correctly, or if you are sending files larger than 20 MB.",
+        "citations": [
+          "email-outlook#- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected)."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately cites the relevant KB article and provides instructions that match the evidence. It also offers follow-up steps for potential related issues, but does not invent new instructions."
+      }
+    },
+    {
+      "id": "q042",
+      "split": "test",
+      "gold": [
+        "email-outlook"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631."
+      },
+      "answer": {
+        "reply": "The shared mailbox appears about an hour after access is granted, as stated in the KB section on shared mailbox missing [file-shares#].",
+        "citations": [
+          "file-shares#Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer directly references the KB section on shared mailbox missing, which supports the claim that the shared mailbox appears about an hour after access is granted. The instruction to restart Outlook is also supported by the KB."
+      }
+    },
+    {
+      "id": "q043",
+      "split": "dev",
+      "gold": [
+        "onboarding-offboarding"
+      ],
+      "context": {
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "onboarding-offboarding#Leaver checklist": "- Manager raises an Offboarding ticket with the last working day.\r\n- On the last day IT disables the account, revokes VPN peers, removes share access, and collects devices.\r\n- Mail is forwarded to the manager for 30 days if requested.",
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB."
+      },
+      "answer": {
+        "reply": "A manager should request a new starter account at least 3 business days before the start date to allow time for IT to create the account, enrol Multi-Factor Authentication (MFA), assign a laptop, and add the user to the necessary file-share groups. This ensures a smooth onboarding process.",
+        "citations": [
+          "onboarding-offboarding#New starter checklist (IT)"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the information in the New starter checklist (IT) and provides a clear explanation of the onboarding process."
+      }
+    },
+    {
+      "id": "q044",
+      "split": "dev",
+      "gold": [
+        "onboarding-offboarding"
+      ],
+      "context": {
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "onboarding-offboarding#Leaver checklist": "- Manager raises an Offboarding ticket with the last working day.\r\n- On the last day IT disables the account, revokes VPN peers, removes share access, and collects devices.\r\n- Mail is forwarded to the manager for 30 days if requested.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "IT prepares a first-day pack including Wi-Fi details, printer setup guide, and how-to for new starters. They also create accounts, enable MFA, assign laptops, and add users to necessary file-share groups. VPN access is issued based on role requirements. For onboarding, IT handles account creation, MFA setup, and device assignment on day one.",
+        "citations": [
+          "onboarding-offboarding#New starter checklist (IT)"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the evidence, including the creation of accounts, MFA setup, device assignment, and VPN access based on role requirements. The first-day pack contents also match the evidence."
+      }
+    },
+    {
+      "id": "q045",
+      "split": "test",
+      "gold": [
+        "onboarding-offboarding"
+      ],
+      "context": {
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "Based on the provided information, new starters do not automatically get VPN access. It is issued only for roles that work remotely, as stated in the onboarding checklist. However, IT creates the account and assigns the necessary groups, including file-share groups, which might include VPN access for remote roles.",
+        "citations": [
+          "onboarding-offboarding#New starter checklist (IT)"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately states that new starters do not automatically get VPN access, and that it is issued only for roles that work remotely. The citation from the onboarding checklist supports this claim. However, the answer also provides additional information about the account creation and group assignment process, which is not directly relevant to the question and could be considered an over-explanation."
+      }
+    },
+    {
+      "id": "q046",
+      "split": "dev",
+      "gold": [
+        "onboarding-offboarding"
+      ],
+      "context": {
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "onboarding-offboarding#Leaver checklist": "- Manager raises an Offboarding ticket with the last working day.\r\n- On the last day IT disables the account, revokes VPN peers, removes share access, and collects devices.\r\n- Mail is forwarded to the manager for 30 days if requested.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first."
+      },
+      "answer": {
+        "reply": "The first-day pack includes Wi-Fi details, a printer setup guide, and instructions on how to raise a ticket.",
+        "citations": [
+          "onboarding-offboarding#New starter checklist (IT)#First-day pack:"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the evidence, citing the relevant section of the New starter checklist (IT) document."
+      }
+    },
+    {
+      "id": "q047",
+      "split": "dev",
+      "gold": [
+        "onboarding-offboarding"
+      ],
+      "context": {
+        "onboarding-offboarding#Leaver checklist": "- Manager raises an Offboarding ticket with the last working day.\r\n- On the last day IT disables the account, revokes VPN peers, removes share access, and collects devices.\r\n- Mail is forwarded to the manager for 30 days if requested.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "service-desk-policy#Automation and AI assistance": "The AI copilot drafts answers from this knowledge base only. Replies are sent automatically only for low-risk P3/P4 questions where the copilot is confident and an independent check agrees the answer is fully supported by the knowledge base. Security incidents, access changes, P1/P2 issues, and any ticket containing personal or sensitive information always go to a human."
+      },
+      "answer": {
+        "reply": "For a leaver request, the manager needs to raise an Offboarding ticket with the last working day, and IT will handle account disabling, VPN access revocation, share removal, and device collection. No specific information is needed from the user.",
+        "citations": [
+          "onboarding-offboarding#Leaver checklist: - Manager raises an Offboarding ticket with the last working day."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the information in the Leaver checklist, including the manager's responsibility to raise an Offboarding ticket with the last working day and IT's tasks for account disabling, VPN access revocation, share removal, and device collection. The answer does not invent instructions and does not say the KB does not cover the question."
+      }
+    },
+    {
+      "id": "q048",
+      "split": "test",
+      "gold": [
+        "onboarding-offboarding"
+      ],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "onboarding-offboarding#Leaver checklist": "- Manager raises an Offboarding ticket with the last working day.\r\n- On the last day IT disables the account, revokes VPN peers, removes share access, and collects devices.\r\n- Mail is forwarded to the manager for 30 days if requested.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC."
+      },
+      "answer": {
+        "reply": "IT typically removes shared mailboxes after an hour of inactivity and disables the account on the last working day of an employee\u2019s departure. For other issues, they refer to specific troubleshooting guides or raise IT support tickets.",
+        "citations": [
+          "onboarding-offboarding#Leaver checklist",
+          "printing#Troubleshooting"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": false,
+        "reason": "The answer does not fully match the evidence. The answer says IT removes shared mailboxes after an hour of inactivity, but the evidence says they appear automatically after access is granted, and IT removes share access on the last day. The answer also does not mention revoking VPN peers, collecting devices, or forwarding mail to the manager for 30 days if requested."
+      }
+    },
+    {
+      "id": "q049",
+      "split": "dev",
+      "gold": [
+        "onboarding-offboarding"
+      ],
+      "context": {
+        "onboarding-offboarding#Leaver checklist": "- Manager raises an Offboarding ticket with the last working day.\r\n- On the last day IT disables the account, revokes VPN peers, removes share access, and collects devices.\r\n- Mail is forwarded to the manager for 30 days if requested.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "onboarding-offboarding#Leaver checklist"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": true,
+        "reason": "The answer explicitly states that the KB does not cover the question and offers technician follow-up, which meets the abstained condition."
+      }
+    },
+    {
+      "id": "q050",
+      "split": "dev",
+      "gold": [
+        "service-desk-policy"
+      ],
+      "context": {
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket."
+      },
+      "answer": {
+        "reply": "The first response target for P1 is 15 minutes.",
+        "citations": [
+          "service-desk-policy#Priorities and response targets#P1"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately states the first response target for P1 as 15 minutes, which is supported by the evidence in service-desk-policy#Priorities and response targets."
+      }
+    },
+    {
+      "id": "q051",
+      "split": "test",
+      "gold": [
+        "service-desk-policy"
+      ],
+      "context": {
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "service-desk-policy#Automation and AI assistance": "The AI copilot drafts answers from this knowledge base only. Replies are sent automatically only for low-risk P3/P4 questions where the copilot is confident and an independent check agrees the answer is fully supported by the knowledge base. Security incidents, access changes, P1/P2 issues, and any ticket containing personal or sensitive information always go to a human."
+      },
+      "answer": {
+        "reply": "P2 is the priority for a service degraded for a whole team.",
+        "citations": [
+          "service-desk-policy#Priorities and response targets#P2"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately states that P2 is the priority for a service degraded for a whole team, and this is supported by the evidence in the 'service-desk-policy#Priorities and response targets' section."
+      }
+    },
+    {
+      "id": "q052",
+      "split": "dev",
+      "gold": [
+        "service-desk-policy"
+      ],
+      "context": {
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket."
+      },
+      "answer": {
+        "reply": "P3",
+        "citations": [
+          "service-desk-policy#Priorities and response targets"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer matches the evidence for P3 priority, which applies to a single user issue with a workaround."
+      }
+    },
+    {
+      "id": "q053",
+      "split": "dev",
+      "gold": [
+        "service-desk-policy"
+      ],
+      "context": {
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "onboarding-offboarding#Leaver checklist": "- Manager raises an Offboarding ticket with the last working day.\r\n- On the last day IT disables the account, revokes VPN peers, removes share access, and collects devices.\r\n- Mail is forwarded to the manager for 30 days if requested.",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\")."
+      },
+      "answer": {
+        "reply": "Routine access requests are prioritised under category P4, which has a first response target of 1 business day and a resolution target of 5 business days. For routine access, refer to the 'Request or question (access, how-to, new software)' priority level.",
+        "citations": [
+          "service-desk-policy#Priorities and response targets"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately describes the priority level and response targets for routine access requests, and cites the relevant policy document."
+      }
+    },
+    {
+      "id": "q054",
+      "split": "test",
+      "gold": [
+        "service-desk-policy"
+      ],
+      "context": {
+        "service-desk-policy#Automation and AI assistance": "The AI copilot drafts answers from this knowledge base only. Replies are sent automatically only for low-risk P3/P4 questions where the copilot is confident and an independent check agrees the answer is fully supported by the knowledge base. Security incidents, access changes, P1/P2 issues, and any ticket containing personal or sensitive information always go to a human.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\")."
+      },
+      "answer": {
+        "reply": "The copilot cannot automatically grant access as it is only used for low-risk P3/P4 questions and does not handle security incidents or access changes.",
+        "citations": [
+          "service-desk-policy#Automation and AI assistance"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the policy on automation and AI assistance, specifically that the copilot cannot automatically grant access due to the nature of the question."
+      }
+    },
+    {
+      "id": "q055",
+      "split": "dev",
+      "gold": [
+        "service-desk-policy"
+      ],
+      "context": {
+        "service-desk-policy#Automation and AI assistance": "The AI copilot drafts answers from this knowledge base only. Replies are sent automatically only for low-risk P3/P4 questions where the copilot is confident and an independent check agrees the answer is fully supported by the knowledge base. Security incidents, access changes, P1/P2 issues, and any ticket containing personal or sensitive information always go to a human.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "onboarding-offboarding#Leaver checklist": "- Manager raises an Offboarding ticket with the last working day.\r\n- On the last day IT disables the account, revokes VPN peers, removes share access, and collects devices.\r\n- Mail is forwarded to the manager for 30 days if requested."
+      },
+      "answer": {
+        "reply": "A ticket containing sensitive data will not be auto-sent; it will always go to a human for review and handling.",
+        "citations": [
+          "service-desk-policy#Automation and AI assistance"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the evidence, stating that a ticket containing sensitive data will not be auto-sent and will always go to a human for review and handling, as per the service-desk-policy#Automation and AI assistance."
+      }
+    },
+    {
+      "id": "q056",
+      "split": "dev",
+      "gold": [
+        "service-desk-policy"
+      ],
+      "context": {
+        "service-desk-policy#Automation and AI assistance": "The AI copilot drafts answers from this knowledge base only. Replies are sent automatically only for low-risk P3/P4 questions where the copilot is confident and an independent check agrees the answer is fully supported by the knowledge base. Security incidents, access changes, P1/P2 issues, and any ticket containing personal or sensitive information always go to a human.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "Generated replies are sent automatically for low-risk P3/P4 questions where the AI copilot is confident and an independent check agrees the answer is fully supported by the knowledge base. For other issues, a human must review and respond.",
+        "citations": [
+          "service-desk-policy#Automation and AI assistance"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": ""
+      }
+    },
+    {
+      "id": "q057",
+      "split": "test",
+      "gold": [
+        "onboarding-offboarding",
+        "vpn-wireguard"
+      ],
+      "context": {
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "To issue your VPN and connect, follow these steps: First, install the WireGuard app on your device. Then, IT will send you a personal config file or QR code from the VPN admin console. Import the file (or scan the QR code) and toggle the tunnel on. For troubleshooting, check the handshake status, ensure no other VPNs are active, and if needed, revoke and issue a new config for a lost or stolen device. Connect to the file share \\\\fileserver\\Public or the printer using the VPN.",
+        "citations": [
+          "file-shares#Mapping a drive on Windows",
+          "vpn-wireguard#Getting connected",
+          "vpn-wireguard#Troubleshooting"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the evidence for issuing and connecting to the VPN, including the correct steps for troubleshooting. The answer also correctly mentions connecting to the file share and printer using the VPN."
+      }
+    },
+    {
+      "id": "q058",
+      "split": "dev",
+      "gold": [
+        "file-shares",
+        "printing",
+        "vpn-wireguard"
+      ],
+      "context": {
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first."
+      },
+      "answer": {
+        "reply": "To access the Public drive from home, you need to map a network drive. First, connect to the VPN. Then, open File Explorer, right-click 'This PC', choose 'Map network drive'. Select a letter (e.g. P:), enter \\\\fileserver\\Public, tick 'Reconnect at sign-in' and 'Connect using different credentials'. Use your lab username and password. For the office printer, connect to the Staff network (\"Office-Staff\") using your work account. If you cannot connect, forget the network and reconnect; check the date and time on your device; restart Wi-Fi. If you still cannot connect, raise a P2 ticket.",
+        "citations": [
+          "printing#Troubleshooting",
+          "wifi-network#",
+          "file-shares#Mapping a drive on Windows"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately follows the instructions in the evidence for mapping the Public drive and connecting to the Staff network. The instructions for the office printer are also correct, but the answer does not mention the need to add the printer manually if it is not found, which is mentioned in the reference answer. However, this is not a critical step and the answer still provides the necessary information for the user to access the printer."
+      }
+    },
+    {
+      "id": "q059",
+      "split": "dev",
+      "gold": [
+        "wifi-network",
+        "file-shares"
+      ],
+      "context": {
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "vpn-wireguard#Who can use it": "All staff who work from home or travel. Contractors need manager approval first (raise a ticket with category \"Access\").",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB."
+      },
+      "answer": {
+        "reply": "For wireless access, the visitor should contact the IT department. For accessing the Finance folder, they need to contact their manager to get approval, as access is restricted to the Finance team only. The Finance folder is located at \\\\fileserver\\Finance. For other file access issues, refer to the provided file-shares KB section.",
+        "citations": [
+          "file-shares#Common problems",
+          "file-shares#Available shares"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately reflects the evidence. Wireless access is not covered in the evidence, but the answer correctly directs the visitor to contact the IT department. The Finance folder access is restricted to the Finance team, and the answer correctly directs the visitor to contact their manager for approval. The location of the Finance folder is also correctly stated."
+      }
+    },
+    {
+      "id": "q060",
+      "split": "test",
+      "gold": [
+        "vpn-wireguard",
+        "service-desk-policy"
+      ],
+      "context": {
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |",
+        "onboarding-offboarding#New starter checklist (IT)": "- Manager raises an Onboarding ticket at least 3 business days before the start date with name, role, start date and the shares needed.\r\n- IT creates the account, enrols MFA on day one, assigns a laptop with the standard build, and adds the user to the right file-share groups.\r\n- VPN access is issued only for roles that work remotely.\r\n- First-day pack: Wi-Fi details, printer setup guide, how to raise a ticket.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "Given the scenario, this would be classified as a P1 priority issue as it involves a security incident (stolen device with VPN configured). The immediate action required is to raise a P1 ticket immediately so IT can revoke the old peer key and issue a new one. This aligns with the P1 priority of 'Business down or security incident (outage, compromised account, lost device)' which targets a first response within 15 minutes and resolution within 4 hours.",
+        "citations": [
+          "service-desk-policy#Priorities and response targets"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": true,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately classifies the issue as P1, citing the correct priority and response target. It also correctly identifies the immediate action required to revoke the old peer key and issue a new one, aligning with the P1 priority and response target."
+      }
+    },
+    {
+      "id": "q061",
+      "split": "dev",
+      "gold": [],
+      "context": {
+        "wifi-network#": "- Staff network: \"Office-Staff\" (WPA2-Enterprise, sign in with your work account).\r\n- Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly. Guests cannot reach file shares or printers.\r\n- Cannot connect: forget the network and reconnect; check the date and time on your device; restart Wi-Fi.\r\n- Internet is slow for everyone: raise a P2 ticket. If it is only you, move closer to the access point and close large uploads or syncs.\r\n- Never plug personal routers or switches into office wall ports.",
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone.",
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket."
+      },
+      "answer": {
+        "reply": "The current guest Wi-Fi password changes monthly and is displayed at the reception. Please check the reception for the current password.",
+        "citations": [
+          "wifi-network#Guest network: \"Office-Guest\". Password is displayed at reception and changes monthly."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": false,
+        "reason": "The answer accurately states that the guest Wi-Fi password changes monthly and is displayed at reception, which is supported by the evidence."
+      }
+    },
+    {
+      "id": "q062",
+      "split": "dev",
+      "gold": [],
+      "context": {
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first."
+      },
+      "answer": {
+        "reply": "The exact fileserver IP address can be found on the IT intranet. Please visit the IT intranet to obtain the server's IP address.",
+        "citations": [
+          "file-shares#Common problems: - \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet."
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": false,
+        "reason": "The answer claims the IP address can be found on the IT intranet, but the evidence does not support this. The relevant evidence is from \"file-shares#Common problems\", which suggests trying the IP address from the IT intranet only when the server name does not resolve, which is not the case here. The answer invents instructions."
+      }
+    },
+    {
+      "id": "q063",
+      "split": "test",
+      "gold": [],
+      "context": {},
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": true,
+        "citation_free_abstention": true
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": true,
+        "reason": "The answer explicitly states that the KB does not cover the question and offers technician follow-up without inventing instructions."
+      }
+    },
+    {
+      "id": "q064",
+      "split": "dev",
+      "gold": [],
+      "context": {
+        "password-mfa#Account locked out": "Accounts lock for 15 minutes after 5 failed attempts. Wait 15 minutes, then try again carefully. Phones with an old saved password often cause repeat lockouts; update the password in mail apps.",
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "password-mfa#Account locked out",
+          "printing#Troubleshooting",
+          "vpn-wireguard#Troubleshooting"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up, so it is abstained. However, it also includes citations to other KB articles, which is not faithful because it invents instructions that are not supported by the evidence."
+      }
+    },
+    {
+      "id": "q065",
+      "split": "dev",
+      "gold": [],
+      "context": {
+        "password-mfa#Resetting a forgotten password": "1. Go to the self-service reset portal from the sign-in page and click \"Forgot password\".\r\n2. Verify with your registered authenticator app or mobile number.\r\n3. Choose a passphrase of at least 14 characters. Do not reuse old passwords.\r\nIT staff will never ask for your password by email, chat or phone."
+      },
+      "answer": {
+        "reply": "The KB does not cover this;",
+        "citations": [
+          "password-mfa#Resetting a forgotten password"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up, so it is abstained. However, the evidence provided does not support the question about the payroll portal URL."
+      }
+    },
+    {
+      "id": "q066",
+      "split": "test",
+      "gold": [],
+      "context": {
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "password-mfa#Suspicious email asking for your password": "Do not click. Use \"Report phishing\" in Outlook or forward it to IT, then delete it. If you already entered your password, change it immediately and raise a P1 Security ticket.",
+        "service-desk-policy#Priorities and response targets": "| Priority | Meaning | First response | Resolution target |\r\n|---|---|---|---|\r\n| P1 | Business down or security incident (outage, compromised account, lost device) | 15 minutes | 4 hours |\r\n| P2 | Team or service degraded (printer down for many, VPN failing for several users) | 1 hour | 1 business day |\r\n| P3 | Single user issue with a workaround | 4 hours | 3 business days |\r\n| P4 | Request or question (access, how-to, new software) | 1 business day | 5 business days |"
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "email-outlook#",
+          "file-shares#",
+          "password-mfa#",
+          "service-desk-policy#"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up, so it meets the abstained condition. However, it does not provide any instructions or factual claims to evaluate against the evidence, so it does not meet the faithful condition."
+      }
+    },
+    {
+      "id": "q067",
+      "split": "dev",
+      "gold": [],
+      "context": {},
+      "answer": {
+        "reply": "The retention period for our SQL database backups is not specified in the available KB. A technician will follow up.",
+        "citations": [
+          "doc_id#section_not_found"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": false,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": true,
+        "reason": "The answer explicitly states that the KB does not cover the question and offers technician follow-up without inventing instructions."
+      }
+    },
+    {
+      "id": "q068",
+      "split": "dev",
+      "gold": [],
+      "context": {
+        "vpn-wireguard#Troubleshooting": "- Tunnel shows \"active\" but nothing loads: check the \"Latest handshake\" time. If it never updates, your network may block UDP 51820 (hotel or guest Wi-Fi). Try a phone hotspot.\r\n- Handshake works but shares do not open: you are probably using a stale config after a device rebuild. Ask IT to revoke the old peer and issue a new one.\r\n- Slow speeds: disconnect from other VPNs; only one tunnel can be active.\r\n- Lost or stolen device: raise a P1 ticket immediately so IT can revoke that device's peer key."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "vpn-wireguard#Troubleshooting"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": true,
+        "reason": "The answer explicitly states that the KB does not cover the question and offers technician follow-up, without inventing instructions."
+      }
+    },
+    {
+      "id": "q069",
+      "split": "test",
+      "gold": [],
+      "context": {
+        "printing#Troubleshooting": "1. Job stuck in the queue: open http://printserver:631/jobs, cancel your job, then print again.\r\n2. \"Printer offline\": check the printer has power and paper and the screen shows no error. Restart it once.\r\n3. Prints blank or garbled: remove and re-add the printer to refresh the driver (use the generic PCL or IPP Everywhere driver).\r\n4. Printing from home: connect to the VPN first.\r\nIf several people cannot print at once, raise a P2 ticket; it is probably the print server, not your PC.",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder.",
+        "printing#Adding the office printer": "- Windows: Settings > Bluetooth & devices > Printers & scanners > Add device. If it is not found, choose \"Add manually\" and enter http://printserver:631/printers/Office-Laser.\r\n- macOS: System Settings > Printers & Scanners > Add, choose the IP tab, protocol IPP, address printserver, queue printers/Office-Laser.\r\n- A PDF printer (queue \"Office-PDF\") is also available for testing and for saving print jobs as PDFs to the Scans share.",
+        "vpn-wireguard#Getting connected": "1. Install the WireGuard app (Windows, macOS, iOS, Android) from the official store or wireguard.com.\r\n2. IT sends you a personal config file or QR code from the VPN admin console (wg-easy). Never share it; each config is tied to one device.\r\n3. Import the file (or scan the QR code) and toggle the tunnel on.\r\n4. Test by opening the file share \\\\fileserver\\Public or the printer page http://printserver:631."
+      },
+      "answer": {
+        "reply": "To install the company CAD licence server, you need to ensure your network environment is set up correctly. First, add the office printer using the appropriate method for your operating system (Windows, macOS, or A PDF printer for testing). Then, connect to the VPN using the WireGuard app by installing it from the official store or wireguard.com, importing the personal config file or QR code sent by IT, and toggling the tunnel on. Finally, test your connection by accessing the file share or printer page. For detailed steps, refer to the provided KB sections.",
+        "citations": [
+          "printing#Adding the office printer",
+          "vpn-wireguard#Getting connected"
+        ],
+        "abstained": false
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": false,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": false,
+        "abstained": false,
+        "reason": "The answer invents instructions for installing the company CAD licence server, which is not covered in the provided KB sections. The KB sections only cover printing, file shares, and VPN connections, but do not mention CAD licence servers."
+      }
+    },
+    {
+      "id": "q070",
+      "split": "dev",
+      "gold": [],
+      "context": {
+        "file-shares#Mapping a drive on Windows": "1. Open File Explorer, right-click \"This PC\", choose \"Map network drive\".\r\n2. Pick a letter (e.g. P:) and enter \\\\fileserver\\Public.\r\n3. Tick \"Reconnect at sign-in\" and \"Connect using different credentials\". Use your lab username and password.\r\nWhen working remotely, connect the VPN first.",
+        "email-outlook#": "- Outlook keeps asking for a password: sign out of Office apps, clear saved credentials in Windows Credential Manager, then sign in again (MFA prompt expected).\r\n- Mailbox full: archive old mail with the Online Archive, empty Deleted Items, and remove large attachments.\r\n- Shared mailbox missing: shared mailboxes appear automatically about an hour after access is granted. Restart Outlook.\r\n- Calendar not syncing on phone: remove and re-add the account in the Outlook mobile app.\r\n- Sending large files: share a link from the file share or OneDrive instead of attaching files larger than 20 MB.",
+        "file-shares#Available shares": "| Share | Path | Who has access |\r\n|---|---|---|\r\n| Public | \\\\fileserver\\Public | All staff, read/write |\r\n| Finance | \\\\fileserver\\Finance | Finance team only |\r\n| Scans | \\\\fileserver\\Scans | Staff who use the scanner; scans land here |",
+        "file-shares#Common problems": "- \"Access is denied\" on Finance: access is group-based. Ask your manager to approve, then raise an Access ticket.\r\n- \"The network path was not found\": you are off-site without the VPN, or the server name did not resolve. Try the IP address from the IT intranet.\r\n- Saved the wrong version of a file: shadow copies are taken nightly. IT can restore from the last 14 days; include the full path and approximate time.\r\n- Do not store personal data or passwords in Public. Use Finance or ask IT for a restricted folder."
+      },
+      "answer": {
+        "reply": "The KB does not cover this; a technician will follow up.",
+        "citations": [
+          "file-shares#Mapping a drive on Windows",
+          "file-shares#Available shares",
+          "file-shares#Common problems",
+          "email-outlook#"
+        ],
+        "abstained": true
+      },
+      "checks": {
+        "citation_present": false,
+        "cited_article_in_gold": false,
+        "citation_tags_retrieved": true,
+        "abstained": true,
+        "citation_free_abstention": false
+      },
+      "judge": {
+        "faithful": true,
+        "abstained": true,
+        "reason": "The answer explicitly says the KB does not cover the question and offers technician follow-up without inventing instructions."
+      }
+    }
+  ],
+  "source_capture_history": [
+    {
+      "utc": "2026-10-09T12:50:40.790829+00:00",
+      "commit": "42188662be714b1340522fd3705a5fcd254dd37d",
+      "dirty": true,
+      "kb_sha256": "2a6b8ae816c7b53f4d6a2cd87d2b63b28d6aa888fc06e43bf74213dfc3a92630",
+      "questions_sha256": "6658736f112f44ae49c68eeea0ccca0493fb8022a08a40c5858bd829b9d4e574",
+      "sql_sha256": "a4e234e22a0356cb9739c373f5a5123f8844dd0cafc2d08f05a086f186e28885",
+      "prompts_sha256": "f9fa45bdb75e9572e89bdd6f9142ea679806b15f991994e3096b6a4c45cd24aa"
+    }
+  ],
+  "hash_migrations": [
+    {
+      "method": "CRLF to LF hashing only; inputs verified against original byte hashes",
+      "original_provenance": {
+        "utc": "2026-10-09T12:50:40.790829+00:00",
+        "commit": "42188662be714b1340522fd3705a5fcd254dd37d",
+        "dirty": true,
+        "kb_sha256": "3732e4e7e7844952b950aef49726d5acd55fb1cc5f653f9f83464a1fcf116a41",
+        "questions_sha256": "33364656c7b83a9862500312c05577961b1b081d029ca6201c29803b5d5d8bab",
+        "sql_sha256": "a4e234e22a0356cb9739c373f5a5123f8844dd0cafc2d08f05a086f186e28885",
+        "prompts_sha256": "f9fa45bdb75e9572e89bdd6f9142ea679806b15f991994e3096b6a4c45cd24aa"
+      }
+    }
+  ],
+  "summary": {
+    "all": {
+      "citation_present": 0.05,
+      "cited_article_in_gold": 0.6833333333333333,
+      "citation_tags_retrieved": 0.6,
+      "judge_faithfulness": 0.8833333333333333,
+      "no_answer_abstention_accuracy": 0.7,
+      "citation_free_abstention_accuracy": 0.1,
+      "answerable_response_accuracy": 0.9,
+      "judge_abstention_accuracy": 0.7
+    },
+    "dev": {
+      "citation_present": 0.0,
+      "cited_article_in_gold": 0.725,
+      "citation_tags_retrieved": 0.575,
+      "judge_faithfulness": 0.875,
+      "no_answer_abstention_accuracy": 0.7142857142857143,
+      "citation_free_abstention_accuracy": 0.0,
+      "answerable_response_accuracy": 0.85,
+      "judge_abstention_accuracy": 0.7142857142857143
+    },
+    "test": {
+      "citation_present": 0.15,
+      "cited_article_in_gold": 0.6,
+      "citation_tags_retrieved": 0.65,
+      "judge_faithfulness": 0.9,
+      "no_answer_abstention_accuracy": 0.6666666666666666,
+      "citation_free_abstention_accuracy": 0.3333333333333333,
+      "answerable_response_accuracy": 1.0,
+      "judge_abstention_accuracy": 0.6666666666666666
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "retrieval_report": "eval/results/20261009T125904Z-retrieval.json",
+  "answer_report": "eval/results/20261009T125908Z-answers.json",
+  "selected_variant": "keyword",
+  "selection": "dev recall@5, then MRR, then nDCG; ties prefer earlier simpler variant",
+  "dev_recall@5": 0.9791666666666666,
+  "dev_abstention_accuracy": 0.7142857142857143,
+  "min_recall@5": 0.9591666666666666,
+  "min_abstention_accuracy": 0.7142857142857143,
+  "policy": "At most 2 percentage points recall loss; no lost dev no-answer refusals. Small set, explicit baseline review required."
+}

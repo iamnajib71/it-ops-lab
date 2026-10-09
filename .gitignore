@@ -2,3 +2,9 @@
 __pycache__/
 *.log
 evidence/raw/
+.pytest_cache/
+.venv/
+AGENTS.md
+CLAUDE.md
+*.cast
+!docs/demo.cast

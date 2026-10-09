@@ -1,4 +1,24 @@
-**IT Ops Lab: a local service-desk copilot with measured retrieval, auditable answers and a regression gate.**
+"""Build the portfolio README using raw measured JSON; never hand-type scores."""
+import json
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+
+def latest(kind):
+    for p in sorted((ROOT/'eval/results').glob(f'*-{kind}.json'),reverse=True):
+        r=json.loads(p.read_text())
+        if r['mode']=='live': return p,r
+    raise RuntimeError('No live '+kind+' report')
+
+def main():
+    rp,r=latest('retrieval'); ap,a=latest('answers'); baseline=json.loads((ROOT/'eval/baseline.json').read_text())
+    labels={'keyword':'Keyword (Postgres)','vector':'Vector (nomic-embed-text)','hybrid':'Hybrid (RRF)','reranked':'Hybrid + local LLM reranker'}
+    table='| Variant | Recall@5 | MRR | nDCG@5 |\n|---|---:|---:|---:|\n'
+    for name,m in r['summary']['all'].items(): table+=f"| {labels[name]} | {m['recall@5']:.4f} | {m['mrr']:.4f} | {m['ndcg@5']:.4f} |\n"
+    am=a['summary']['all']
+    answer_table='| Answer check (keyword; one local draft) | Measured score |\n|---|---:|\n'
+    for label,key in [('Exact inline citation present (60 answerable)','citation_present'),('Cited article in gold set (60 answerable)','cited_article_in_gold'),('Citation tags match retrieved sections (60 answerable)','citation_tags_retrieved'),('Local judge faithfulness (60 answerable)','judge_faithfulness'),('Explicit no-answer abstention (10 questions)','no_answer_abstention_accuracy'),('Citation-free abstention (10 questions)','citation_free_abstention_accuracy'),('Answered rather than refused (60 answerable)','answerable_response_accuracy'),('Judge-rated abstention (10 questions)','judge_abstention_accuracy')]:
+        answer_table+=f'| {label} | {am[key]:.4f} |\n'
+    text=f'''**IT Ops Lab: a local service-desk copilot with measured retrieval, auditable answers and a regression gate.**
 
 ![Real ticket demo and evaluation checks](docs/demo.gif)
 
@@ -22,13 +42,13 @@ Docker, Postgres, n8n and local Ollama models provide the complete demo.
 flowchart LR
   T[Fictional ticket webhook] --> P[Normalize and redact]
   P --> C[Local triage]
-  C --> F{RAG_MEASURED flag}
+  C --> F{{RAG_MEASURED flag}}
   F -->|off: original path| H[Keyword + vector RRF]
   F -->|on: dev winner| K[Keyword retrieval]
   F -->|on: variant reranked| R[RRF top 20 + local reranker]
   H & K & R --> D[Four chunks: two local drafts]
   D --> J[Local blind judge]
-  J --> G{Deterministic policy gate}
+  J --> G{{Deterministic policy gate}}
   G --> A[Auto reply / human approval / escalation]
   PG[(Postgres + pgvector)] --- H & K & R
   PG --> GF[Grafana telemetry]
@@ -59,14 +79,14 @@ Ports 55432, 5678 and 13000 must be available.
 git clone https://github.com/iamnajib71/it-ops-lab.git
 Set-Location it-ops-lab
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\\.venv\\Scripts\\python.exe -m pip install -r requirements-dev.txt
 ollama pull nomic-embed-text
 ollama pull qwen2.5:3b
 ollama pull llama3.1:8b
-.\.venv\Scripts\python.exe scripts/setup_lab.py --measured
-.\.venv\Scripts\python.exe tests/run_demo.py
-.\.venv\Scripts\python.exe eval/run_retrieval.py
-.\.venv\Scripts\python.exe -m pytest -q
+.\\.venv\\Scripts\\python.exe scripts/setup_lab.py --measured
+.\\.venv\\Scripts\\python.exe tests/run_demo.py
+.\\.venv\\Scripts\\python.exe eval/run_retrieval.py
+.\\.venv\\Scripts\\python.exe -m pytest -q
 ```
 
 Setup generates ignored local `.env` credentials, starts digest-pinned images,
@@ -90,49 +110,33 @@ empty evidence context rather than stopping the workflow.
 
 ## Results and evidence
 
-Real local run: 2026-10-09 UTC. Eight articles, 18 chunks,
+Real local run: {r['provenance']['utc'][:10]} UTC. Eight articles, 18 chunks,
 60 answerable questions plus ten no-answer questions. Recall uses the top five
 chunks, deduplicating article IDs. MRR and nDCG are article-based; see the
 [full protocol](eval/README.md) for the exact definitions.
 
-| Variant | Recall@5 | MRR | nDCG@5 |
-|---|---:|---:|---:|
-| Keyword (Postgres) | 0.9861 | 0.8750 | 0.8957 |
-| Vector (nomic-embed-text) | 0.9528 | 0.9196 | 0.9162 |
-| Hybrid (RRF) | 0.9778 | 0.9408 | 0.9416 |
-| Hybrid + local LLM reranker | 0.9028 | 0.8837 | 0.8688 |
-
+{table}
 
 The table describes all 60 answerable questions. Selection uses the 40 dev
 questions only: dev recall@5, then MRR, then nDCG, with ties favouring simpler
-variants. Keyword wins dev recall@5 (0.9792); hybrid has better
-MRR. The held-out 20-question recall@5 is keyword 1.0000,
-vector 0.9750, hybrid 1.0000, reranked 0.9250.
+variants. Keyword wins dev recall@5 ({r['summary']['dev']['keyword']['recall@5']:.4f}); hybrid has better
+MRR. The held-out 20-question recall@5 is keyword {r['summary']['test']['keyword']['recall@5']:.4f},
+vector {r['summary']['test']['vector']['recall@5']:.4f}, hybrid {r['summary']['test']['hybrid']['recall@5']:.4f}, reranked {r['summary']['test']['reranked']['recall@5']:.4f}.
 
 **The reranker did not help.** It reduced coverage and first-hit ranking, and
-23/70 calls produced invalid ID permutations and used hybrid fallback.
+{r['reranker_fallback_count']}/70 calls produced invalid ID permutations and used hybrid fallback.
 The feature flag exposes it for inspection, but the measured configuration
 selects keyword rather than promoting an unsuccessful experiment.
 
-| Answer check (keyword; one local draft) | Measured score |
-|---|---:|
-| Exact inline citation present (60 answerable) | 0.0500 |
-| Cited article in gold set (60 answerable) | 0.6833 |
-| Citation tags match retrieved sections (60 answerable) | 0.6000 |
-| Local judge faithfulness (60 answerable) | 0.8833 |
-| Explicit no-answer abstention (10 questions) | 0.7000 |
-| Citation-free abstention (10 questions) | 0.1000 |
-| Answered rather than refused (60 answerable) | 0.9000 |
-| Judge-rated abstention (10 questions) | 0.7000 |
-
+{answer_table}
 
 Answer generation uses local `qwen2.5:3b`; the second-stage judge is local
 `llama3.1:8b`. Citations are checked before judging. Judge scores are model
 opinions, not human-certified correctness. This controlled single-draft experiment
 is separate from production's two-draft arbitration and policy gate.
 
-Raw evidence: [retrieval report](eval/results/20261009T125904Z-retrieval.json),
-[answer report](eval/results/20261009T125908Z-answers.json), [all historical reports](eval/results),
+Raw evidence: [retrieval report]({rp.relative_to(ROOT).as_posix()}),
+[answer report]({ap.relative_to(ROOT).as_posix()}), [all historical reports](eval/results),
 [cached embeddings and raw model responses](eval/fixtures),
 [original hybrid demo output](docs/demo-hybrid.txt).
 Reports preserve commit hashes, dirty-tree status, input hashes, model digests and
@@ -142,22 +146,22 @@ model inputs and preserves capture history.
 
 ### Regression gate and re-run
 
-Dev baseline: keyword recall@5 0.9792, no-answer abstention
-0.7143. CI fails below recall@5 **0.9592** or
-abstention **0.7143**. The recall allowance is two percentage
+Dev baseline: keyword recall@5 {baseline['dev_recall@5']:.4f}, no-answer abstention
+{baseline['dev_abstention_accuracy']:.4f}. CI fails below recall@5 **{baseline['min_recall@5']:.4f}** or
+abstention **{baseline['min_abstention_accuracy']:.4f}**. The recall allowance is two percentage
 points; abstention permits no lost dev refusals. Thresholds and source reports
 are committed in [baseline.json](eval/baseline.json).
 
 ```powershell
 # Fast offline replay; no Docker or model downloads required
-.\.venv\Scripts\python.exe eval/run_retrieval.py
-.\.venv\Scripts\python.exe eval/run_answers.py --variant keyword
-.\.venv\Scripts\python.exe -m pytest -q
+.\\.venv\\Scripts\\python.exe eval/run_retrieval.py
+.\\.venv\\Scripts\\python.exe eval/run_answers.py --variant keyword
+.\\.venv\\Scripts\\python.exe -m pytest -q
 
 # Live measurements against the local lab
-.\.venv\Scripts\python.exe eval/run_retrieval.py --live
-.\.venv\Scripts\python.exe eval/verify_sql.py
-.\.venv\Scripts\python.exe eval/run_answers.py --live --variant keyword
+.\\.venv\\Scripts\\python.exe eval/run_retrieval.py --live
+.\\.venv\\Scripts\\python.exe eval/verify_sql.py
+.\\.venv\\Scripts\\python.exe eval/run_answers.py --live --variant keyword
 # For a different candidate: --variant hybrid or --variant reranked
 ```
 
@@ -221,3 +225,7 @@ before real use. The office infrastructure is documented in the companion
 ## Built by Nazmul Hassan
 
 [LinkedIn](https://www.linkedin.com/in/iamnajib71) · [GitHub](https://github.com/iamnajib71)
+'''
+    (ROOT/'README.md').write_text(text,encoding='utf-8')
+
+if __name__=='__main__': main()
