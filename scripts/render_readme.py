@@ -138,7 +138,9 @@ is separate from production's two-draft arbitration and policy gate.
 Raw evidence: [retrieval report]({rp.relative_to(ROOT).as_posix()}),
 [answer report]({ap.relative_to(ROOT).as_posix()}), [all historical reports](eval/results),
 [cached embeddings and raw model responses](eval/fixtures),
-[original hybrid demo output](docs/demo-hybrid.txt).
+[original hybrid demo output](docs/demo-hybrid.txt),
+[clean-clone verification](docs/verification.md),
+[real reranker webhook responses](eval/results/20261009T132128Z-reranker-integration.json).
 Reports preserve commit hashes, dirty-tree status, input hashes, model digests and
 UTC dates. Initial measurements were made on the identified dirty working tree;
 their exact inputs and raw responses are retained. Capture resumes identical
