@@ -10,7 +10,7 @@
 pytest output; playback is compressed to about a minute. Fictional tickets only.
 Docker, Postgres, n8n and local Ollama models provide the complete demo.
 
-## What it shows recruiters
+## Technical capabilities
 
 - Evaluation discipline: 70 labelled questions, four retrieval variants, raw per-question evidence, dev/test splits and baseline-derived CI gates.
 - AI automation engineering: n8n ticket intake, local retrieval/reranking behind a flag, two drafts, judge review and a deterministic human approval gate.
