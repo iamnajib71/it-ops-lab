@@ -1,34 +1,37 @@
-**IT Ops Lab: a local service-desk copilot with measured retrieval, auditable answers and a regression gate.**
+# IT Ops Lab
 
-<!-- project-overview:start -->
-## Project overview
+I built a local service-desk copilot that retrieves office runbooks, drafts replies and sends sensitive tickets for human review, then measured where its answers and retrieval fall short.
 
-| Area | What to look for |
+![Real ticket processing and evaluation checks](docs/demo.gif)
+
+[![CI](https://github.com/iamnajib71/it-ops-lab/actions/workflows/eval.yml/badge.svg)](https://github.com/iamnajib71/it-ops-lab/actions/workflows/eval.yml) · [MIT licence](LICENSE)
+
+## At a glance
+
+| Area | Evidence-backed summary |
 | --- | --- |
-| **Problem addressed** | Support tickets need grounded answers, consistent escalation and an auditable decision about human approval. |
-| **Implemented work** | Built local n8n intake, redaction, retrieval, two drafts, judge review and a deterministic approval gate. Compared four retrieval variants on 70 labelled questions and selected the measured dev winner. |
-| **Skills demonstrated** | Workflow automation, retrieval evaluation, Python, PostgreSQL/pgvector, local models, regression testing and service-desk triage. |
-| **Demo** | [Watch the real ticket and evaluation recording](docs/demo.gif); playback is compressed to about a minute. |
-| **How to use it** | [Quick start](#quick-start-windows-powershell): provision the local stack, submit the fictional demo tickets, then run retrieval evaluation and pytest. Expected: routing decisions plus reproducible evaluation output. |
-| **Verification** | [Results and evidence](#results-and-evidence). Routing checks establish the workflow decision; they do not prove an end-user issue was fixed. |
+| **The problem** | In this simulated office, support staff repeatedly search VPN, printing and onboarding instructions before replying; incomplete retrieval or confident unsupported advice wastes investigation time and can misdirect a user. |
+| **What I built** | I connected ticket intake, knowledge retrieval and local LLM drafts in n8n, added deterministic approval rules and compared retrieval approaches against labelled questions. |
+| **Results** | [70 labelled questions with raw retrieval and answer measurements](eval/README.md); [all 6 demo tickets routed as expected and 8 regression tests passed from a public clone](docs/verification.md). Routing success does not prove incident resolution. |
+| **Skills shown** | Python, n8n, PostgreSQL, retrieval evaluation, local LLMs, service desk triage, regression testing, CI/CD and Grafana. |
+| **Relevant roles** | Application Support Analyst, Junior Automation Engineer, QA Analyst, Service Desk Analyst. |
+| **How it was built** | Designed, specified and reviewed by me; built with Codex as my coding agent (vibe coding). Verification and its limits are linked below. |
+| **Try it / evidence** | [Demo](docs/demo.gif) · [Quick start](#quick-start-windows-powershell) · [Evaluation protocol](eval/README.md) · [Raw results](eval/results/) |
 
-<!-- project-overview:end -->
+## What I did, step by step
 
-![Real ticket demo and evaluation checks](docs/demo.gif)
+1. Authored support articles and fictional questions, then [defined the retrieval and answer metrics](eval/README.md).
+2. Built ticket intake, redaction, retrieval, draft review and deterministic escalation workflows.
+3. Compared keyword, vector, hybrid and reranked retrieval while preserving raw responses and input provenance.
+4. Selected the development-set winner and kept experimental retrieval behind a feature flag, using [committed baseline thresholds](eval/baseline.json).
+5. Measured citation quality and abstention separately from retrieval so weak answer behaviour stayed visible.
+6. Replayed cached evidence in CI and repeated setup and the ticket demo from a [fresh public clone](docs/verification.md).
 
-[![CI](https://github.com/iamnajib71/it-ops-lab/actions/workflows/eval.yml/badge.svg)](https://github.com/iamnajib71/it-ops-lab/actions/workflows/eval.yml)
-[![MIT licence](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
-![Python](https://img.shields.io/badge/main_language-Python-blue)
+## Problems I hit and how I solved them
 
-**Runs locally.** The GIF records real n8n ticket processing, cached evaluation and
-pytest output; playback is compressed to about a minute. Fictional tickets only.
-Docker, Postgres, n8n and local Ollama models provide the complete demo.
-
-## Technical capabilities
-
-- Evaluation discipline: 70 labelled questions, four retrieval variants, raw per-question evidence, dev/test splits and baseline-derived CI gates.
-- AI automation engineering: n8n ticket intake, local retrieval/reranking behind a flag, two drafts, judge review and a deterministic human approval gate.
-- Service desk judgement: VPN, shares, print, MFA and onboarding runbooks; P1/P2 escalation, access approval and sensitive-data redaction.
+- **The webhook was not ready when HTTP health passed:** added a wait for the published ticket webhook, then reran setup with fresh volumes. [Clean-start failure and verification](docs/verification.md).
+- **The reranker reduced retrieval quality:** retained its raw failures, selected keyword retrieval on development results and kept reranking optional. [Comparison and protocol](eval/README.md).
+- **A citation or model judge can still endorse a weak answer:** measured citation format, evidence membership and abstention separately and documented the need for manual review. [Answer report](eval/results/20261009T125908Z-answers.json).
 
 ## Architecture
 
