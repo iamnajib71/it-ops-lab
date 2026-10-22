@@ -1,5 +1,19 @@
 **IT Ops Lab: a local service-desk copilot with measured retrieval, auditable answers and a regression gate.**
 
+<!-- project-overview:start -->
+## Project overview
+
+| Area | What to look for |
+| --- | --- |
+| **Problem addressed** | Support tickets need grounded answers, consistent escalation and an auditable decision about human approval. |
+| **Implemented work** | Built local n8n intake, redaction, retrieval, two drafts, judge review and a deterministic approval gate. Compared four retrieval variants on 70 labelled questions and selected the measured dev winner. |
+| **Skills demonstrated** | Workflow automation, retrieval evaluation, Python, PostgreSQL/pgvector, local models, regression testing and service-desk triage. |
+| **Demo** | [Watch the real ticket and evaluation recording](docs/demo.gif); playback is compressed to about a minute. |
+| **How to use it** | [Quick start](#quick-start-windows-powershell): provision the local stack, submit the fictional demo tickets, then run retrieval evaluation and pytest. Expected: routing decisions plus reproducible evaluation output. |
+| **Verification** | [Results and evidence](#results-and-evidence). Routing checks establish the workflow decision; they do not prove an end-user issue was fixed. |
+
+<!-- project-overview:end -->
+
 ![Real ticket demo and evaluation checks](docs/demo.gif)
 
 [![CI](https://github.com/iamnajib71/it-ops-lab/actions/workflows/eval.yml/badge.svg)](https://github.com/iamnajib71/it-ops-lab/actions/workflows/eval.yml)
