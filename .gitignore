@@ -4,7 +4,5 @@ __pycache__/
 evidence/raw/
 .pytest_cache/
 .venv/
-AGENTS.md
-CLAUDE.md
 *.cast
 !docs/demo.cast
