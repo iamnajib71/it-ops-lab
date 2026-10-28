@@ -15,7 +15,6 @@ I built a local service-desk copilot that retrieves office runbooks, drafts repl
 | **Results** | [70 labelled questions with raw retrieval and answer measurements](eval/README.md); [all 6 demo tickets routed as expected and 8 regression tests passed from a public clone](docs/verification.md). Routing success does not prove incident resolution. |
 | **Skills shown** | Python, n8n, PostgreSQL, retrieval evaluation, local LLMs, service desk triage, regression testing, CI/CD and Grafana. |
 | **Relevant roles** | Junior AI Engineer, AI Automation Developer, Application Support Analyst, QA Analyst, Service Desk Analyst. |
-| **How it was built** | Designed, specified and reviewed by me; built with Codex as my coding agent (vibe coding). Verification and its limits are linked below. |
 | **Try it / evidence** | [Demo](docs/demo.gif) · [Quick start](#quick-start-windows-powershell) · [Evaluation protocol](eval/README.md) · [Raw results](eval/results/) |
 
 ## What I did, step by step
